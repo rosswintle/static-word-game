@@ -130,14 +130,32 @@
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('scrabble', () => ({
-        acrossFlag: false,
-        x: 0,
-        y: 0,
-        word: '',
-        move: null,
+        newAcrossFlag: false,
+        newX: 0,
+        newY: 0,
+        newWord: '',
+        game: null,
+        player1: null,
+        player2: null,
 
         init() {
-            this.move = new Move(this.acrossFlag, this.x, this.y, this.word);
+            this.player1 = new Player(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 0)
+            this.player2 = new Player(['T', 'U', 'V', 'W', 'X', 'Y', 'Z'], 0)
+            this.game = new Game(this.player1, this.player2, [])
+        },
+
+        addNewWord() {
+            this.game.moves.push(
+                new Move(
+                    this.newAcrossFlag,
+                    this.newX,
+                    this.newY,
+                    this.newWord,
+                )
+            );
+            this.newWord = '';
+            this.newX = 0;
+            this.newY = 0;
         }
     }))
 })
