@@ -142,17 +142,28 @@ document.addEventListener('alpine:init', () => {
         p1Tiles: '',
         p2Score: 0,
         p2Tiles: '',
+        board: [],
 
         init() {
             this.player1 = new Player(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 0)
             this.player2 = new Player(['T', 'U', 'V', 'W', 'X', 'Y', 'Z'], 0)
             this.game = new Game(this.player1, this.player2, [])
+            this.emptyBoard();
+        },
+
+        emptyBoard() {
+            this.board = Array(15).fill([]);
+            let emptyRow = Array(15).fill('');
+            // Need to clone in the empty rows
+            for (let i = 0; i < 15; i++) {
+                this.board[i] = [...emptyRow];
+            }
         },
 
         addNewWord() {
             this.game.moves.push(
                 new Move(
-                    this.newAcrossFlag,
+                    this.newAcrossFlag === '1' || this.newAcrossFlag === 'true',
                     this.newX,
                     this.newY,
                     this.newWord,
@@ -173,6 +184,7 @@ document.addEventListener('alpine:init', () => {
             this.p2Tiles = this.player2.tiles.join('')
             console.log(this.game.moves)
             this.game.moves = [...this.game.moves] // Force reactivity
+            this.replayMovesToBoard();
         },
 
         updateP1() {
@@ -184,5 +196,22 @@ document.addEventListener('alpine:init', () => {
             this.player2 = new Player(this.p2Tiles.split(''), this.p2Score)
             this.game.player2 = this.player2
         },
+
+        replayMovesToBoard() {
+            this.emptyBoard();
+            this.game.moves.forEach((move) => {
+                let x = move.x
+                let y = move.y
+                let word = move.word
+                let across = move.acrossFlag
+                for (let i = 0; i < word.length; i++) {
+                    if (across) {
+                        this.board[y][x + i] = word[i]
+                    } else {
+                        this.board[y + i][x] = word[i]
+                    }
+                }
+            })
+        }
     }))
 })

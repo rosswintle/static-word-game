@@ -58,8 +58,8 @@ class Move {
 
         acrossFlag = coded.popBits(1);
 
-        y = coded.popBits(4);
-        x = coded.popBits(4);
+        y = Number(coded.popBits(4));
+        x = Number(coded.popBits(4));
 
         length = coded.popBits(4);
 
