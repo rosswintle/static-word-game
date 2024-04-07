@@ -33,8 +33,9 @@ class Game {
     encodeAsBigint() {
         let gameAsBigInt = new CodedInt(0n);
 
-        // The moves
-        this.moves.map((move) => {
+        // The moves - Reverse them first, so that the most recent move is the last one pushed
+        // So that when we decode and unstack, the first move is first
+        this.moves.toReversed().map((move) => {
             gameAsBigInt.pushBits(move.getBitCount(), move.encodeAsBigint().getValue());
         });
 
@@ -51,7 +52,7 @@ class Game {
      * @returns {Game}
      */
     static decodeFromBigInt(coded) {
-        debugger;
+        // debugger;
         let player2 = Player.decodeFromBigInt(coded);
         coded = coded >> BigInt(player2.getBitCount());
 

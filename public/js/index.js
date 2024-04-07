@@ -137,6 +137,11 @@ document.addEventListener('alpine:init', () => {
         game: null,
         player1: null,
         player2: null,
+        base64code: '',
+        p1Score: 0,
+        p1Tiles: '',
+        p2Score: 0,
+        p2Tiles: '',
 
         init() {
             this.player1 = new Player(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 0)
@@ -156,6 +161,28 @@ document.addEventListener('alpine:init', () => {
             this.newWord = '';
             this.newX = 0;
             this.newY = 0;
-        }
+        },
+
+        decodeBase64() {
+            this.game = Game.decodeFromBigInt(CodedInt.fromBase64(this.base64code).getValue())
+            this.player1 = this.game.player1
+            this.player2 = this.game.player2
+            this.p1Score = this.player1.score
+            this.p1Tiles = this.player1.tiles.join('')
+            this.p2Score = this.player2.score
+            this.p2Tiles = this.player2.tiles.join('')
+            console.log(this.game.moves)
+            this.game.moves = [...this.game.moves] // Force reactivity
+        },
+
+        updateP1() {
+            this.player1 = new Player(this.p1Tiles.split(''), this.p1Score)
+            this.game.player1 = this.player1
+        },
+
+        updateP2() {
+            this.player2 = new Player(this.p2Tiles.split(''), this.p2Score)
+            this.game.player2 = this.player2
+        },
     }))
 })

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Static Scrabble</title>
     <meta name="description" content="">
 
     <link rel="stylesheet" href="/css/styles.css">
@@ -13,7 +13,7 @@
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Home Page">
+    <meta property="og:title" content="Static Scrabble">
     <meta property="og:description" content="">
     <meta property="og:image" content="">
 
@@ -21,7 +21,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="">
     <meta property="twitter:url" content="">
-    <meta name="twitter:title" content="Home Page">
+    <meta name="twitter:title" content="Static Scrabble">
     <meta name="twitter:description" content="">
     <meta name="twitter:image" content="">
 </head>
@@ -34,51 +34,99 @@
 
 <h1 class="mt-8 text-6xl text-center">Static Scrabble!</h1>
 
-<h2 class="mt-4 text-2xl text-center">Sssh, we're only testing!</h2>
-
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto">
-
     <div>
-        <input name="acrossFlag" type="text" x-model="newAcrossFlag">
-    </div>
+        <div>
+            <h2 class="font-bold mb-2">Decode from Base64</h2>
+            <div class="mb-2 flex items-center">
+                <span>Code</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="base64code" type="text" x-model="base64code">
+            </div>
+            <button class="px-4 py-2 mt-2 border" @click="decodeBase64">Decode</button>
+        </div>
 
-    <div>
-        <input name="x" type="number" min=0 max=15 x-model="newX">
-    </div>
 
-    <div>
-        <input name="y" type="number" min=0 max=15 x-model="newY">
-    </div>
+        <div class="mt-4">
+            <h2 class="font-bold mb-2">Add a move</h2>
+            <div class="mb-2 flex items-center">
+                <span>Across?</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="acrossFlag" type="text" x-model="newAcrossFlag">
+            </div>
 
-    <div>
-        <input name="word" type="text" x-model="newWord">
-    </div>
-    <button @click="addNewWord">Add</button>
+            <div class="mb-2 flex items-center">
+                <span>X</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="x" type="number" min=0 max=15 x-model="newX">
+            </div>
 
-    <h3>Moves</h3>
-    <ul>
-        <template x-for="(move, index) in game.moves" :key="`move-${index}`">
-            <li>
-                Across: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span>
-                | X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span>
-                | Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span>
-                | Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span>
-            </li>
-        </template>
-    </ul>
-    <!-- Encoded move: <span x-text="move.encodeAsBigint().toString()"></span><br>
-    Decoded move: Across? <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span><br>
-    X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span><br>
-    Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span><br>
-    Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span><br>
-    <br>
-    ASCII: <span x-text="move.encodeAsBigint().toAscii()"></span><br>
-    From ASCII (Should be same as Encoded): <span
-        x-text="CodedInt.fromAscii(move.encodeAsBigint().toAscii()).toString()"></span><br>
-    <br> -->
-    Game Base64: <code x-text="game.encodeAsBigint().toBase64()"></code><br>
-    <!-- From Base64 (Should be same as Encoded): <span
-        x-text="CodedInt.fromBase64(move.encodeAsBigint().toBase64()).toString()"></span><br> -->
+            <div class="mb-2 flex items-center">
+                <span>Y</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="y" type="number" min=0 max=15 x-model="newY">
+            </div>
+
+            <div class="mb-2 flex items-center">
+                <span>Word</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="word" type="text" x-model="newWord">
+            </div>
+            <button class="px-4 py-2 mt-2 border" @click="addNewWord">Add</button>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="font-bold mb-2">Player 1</h2>
+            <div class="mb-2 flex items-center">
+                <span>Score</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="p1Score" type="text" x-model="p1Score">
+            </div>
+
+            <div class="mb-2 flex items-center">
+                <span>Tiles</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="p1Tiles" type="text" x-model="p1Tiles">
+            </div>
+
+            <button class="px-4 py-2 mt-2 border" @click="updateP1">Update P1</button>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="font-bold mb-2">Player 2</h2>
+            <div class="mb-2 flex items-center">
+                <span>Score</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="p2Score" type="text" x-model="p2Score">
+            </div>
+
+            <div class="mb-2 flex items-center">
+                <span>Tiles</span>
+                <input class="px-2 py-1 ml-2 text-sm" name="p2Tiles" type="text" x-model="p2Tiles">
+            </div>
+
+            <button class="px-4 py-2 mt-2 border" @click="updateP2">Update P2</button>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="font-bold">Moves</h3>
+            <ul class="mb-4">
+                <template x-for="(move, index) in game.moves" :key="`move-${index}`">
+                    <li>
+                        Across: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span>
+                        | X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span>
+                        | Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span>
+                        | Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span>
+                    </li>
+                </template>
+            </ul>
+            <!-- Encoded move: <span x-text="move.encodeAsBigint().toString()"></span><br>
+        Decoded move: Across? <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span><br>
+        X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span><br>
+        Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span><br>
+        Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span><br>
+        <br>
+        ASCII: <span x-text="move.encodeAsBigint().toAscii()"></span><br>
+        From ASCII (Should be same as Encoded): <span
+            x-text="CodedInt.fromAscii(move.encodeAsBigint().toAscii()).toString()"></span><br>
+        <br> -->
+            Game Base64: <code x-text="game.encodeAsBigint().toBase64()"></code><br>
+            <!-- From Base64 (Should be same as Encoded): <span
+            x-text="CodedInt.fromBase64(move.encodeAsBigint().toBase64()).toString()"></span><br> -->
+        </div>
+    </div>
 </div>
 
 
