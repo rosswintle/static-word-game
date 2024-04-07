@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Home Page">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="">
+    <meta property="twitter:url" content="">
+    <meta name="twitter:title" content="Home Page">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="">
+</head>
+
+<header class="">
+</header>
+
+<body>
+    
+
+<h1 class="mt-8 text-6xl text-center">Static Scrabble!</h1>
+
+<h2 class="mt-4 text-2xl text-center">Sssh, we're only testing!</h2>
+
+<div x-data="scrabble" class="w-full max-w-4xl mx-auto">
+
+    <div>
+        <input name="acrossFlag" type="text" x-model="acrossFlag" @change="move.acrossFlag = Boolean(acrossFlag)">
+    </div>
+
+    <div>
+        <input name="x" type="number" min=0 max=15 x-model="x" @change="move.x = x">
+    </div>
+
+    <div>
+        <input name="y" type="number" min=0 max=15 x-model="y" @change="move.y = y">
+    </div>
+
+    <div>
+        <input name="word" type="text" x-model="word" @change="move.word = word">
+    </div>
+
+    Encoded move: <span x-text="move.encodeAsBigint().toString()"></span><br>
+    Decoded move: Across? <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span><br>
+    X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span><br>
+    Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span><br>
+    Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span><br>
+    <br>
+    ASCII: <span x-text="move.encodeAsBigint().toAscii()"></span><br>
+    From ASCII (Should be same as Encoded): <span
+        x-text="CodedInt.fromAscii(move.encodeAsBigint().toAscii()).toString()"></span><br>
+    <br>
+    Base64: <code x-text="move.encodeAsBigint().toBase64()"></code><br>
+    From Base64 (Should be same as Encoded): <span
+        x-text="CodedInt.fromBase64(move.encodeAsBigint().toBase64()).toString()"></span><br>
+</div>
+
+
+    <footer class="">
+</footer>
+<script src="/js/CodedInt.js"></script>
+<script src="/js/Player.js"></script>
+<script src="/js/Move.js"></script>
+<script src="/js/Game.js"></script>
+<script src="/js/index.js"></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>
