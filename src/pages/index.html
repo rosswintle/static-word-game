@@ -81,10 +81,26 @@
                 <template x-for="(row, rowIndex) in board" :key="`row-${rowIndex}`">
                     <div class="flex flex-row">
                         <template x-for="(tile, colIndex) in row" :key="`tile-${colIndex}`">
-                            <div class="border border-gray-300 w-6 h-6 leading-6 text-center" x-text="tile"></div>
+                            <button :class="{
+                                'border border-gray-300 w-6 h-6 leading-6 text-center' : true,
+                                'bg-blue-500 text-white' : colIndex === selectedTile.x && rowIndex === selectedTile.y,
+                                'bg-blue-200' : tileIsInEnterLine(colIndex, rowIndex)
+                            }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
                         </template>
                     </div>
                 </template>
+            </div>
+
+            <div id="enter-move-ui" class="mt-4">
+                <h2 class="font-bold mb-2">Your tiles</h2>
+                <div class="mb-2 flex items-center">
+                    <template x-for="(tile, index) in player1.tiles" :key="`tile-${index}`">
+                        <button class="w-6 h-6 leading-6 text-center border border-grey-300 mx-2"
+                            :class="{'bg-blue-500 text-white': index === playerTileSelected}"
+                            @click="selectPlayerTile(index)" <span x-text="tile"></span>
+                        </button>
+                    </template>
+                </div>
             </div>
 
             <div id="output-ui" class="mt-4">

@@ -144,6 +144,16 @@ document.addEventListener('alpine:init', () => {
         p2Tiles: '',
         board: [],
 
+        // Actual game stuff
+        tileIsSelected: false,
+        selectedTile: {
+            x: 0,
+            y: 0
+        },
+        enterDirection: 'across',
+        enterOffset: 0, // Offset from the selected tile for entering new letters
+        playerTileSelected: false, // Normally an index into player1.tiles
+
         init() {
             this.player1 = new Player(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 0)
             this.player2 = new Player(['T', 'U', 'V', 'W', 'X', 'Y', 'Z'], 0)
@@ -212,6 +222,62 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
             })
+        },
+
+        tileHasLetter(x, y) {
+            return this.board[y][x] !== '';
+        },
+
+        tileClick(x, y) {
+            if (this.tileHasLetter(x, y)) {
+                return;
+            }
+
+            // Set or toggle tile direction first
+            if (!this.tileSelected) {
+                this.enterDirection = 'across';
+            } else {
+                this.enterDirection = this.enterDirection === 'across' ? 'down' : 'across';
+            }
+
+            this.tileSelected = true;
+            this.selectedTile = { 'x': x, 'y': y };
+        },
+
+        tileIsInEnterLine(x, y) {
+            if (!this.tileSelected) {
+                return false;
+            }
+            if (this.enterDirection === 'across') {
+                return y === this.selectedTile.y && x >= this.selectedTile.x;
+            }
+            if (this.enterDirection === 'down') {
+                return x === this.selectedTile.x && y >= this.selectedTile.y;
+            }
+        },
+
+        /**
+         * If a board tile is selected and we are in "enter" mode then add to the board
+         *
+         * Otherwise, just highlight the rack tile.
+         *
+         * @param {number} tile Index to tile
+         */
+        selectPlayerTile(tile) {
+            if (!this.tileSelected) {
+                this.playerTileSelected = tile;
+                return
+            }
+
+            if (this.enterDirection === 'across') {
+                this.board[this.selectedTile.y][this.selectedTile.x + this.enterOffset] = this.player1.tiles[tile];
+                this.enterOffset++;
+            }
+
+            if (this.enterDirection === 'down') {
+                this.board[this.selectedTile.y + this.enterOffset][this.selectedTile.x] = this.player1.tiles[tile];
+                this.enterOffset++;
+            }
         }
     }))
 })
