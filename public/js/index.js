@@ -145,14 +145,15 @@ document.addEventListener('alpine:init', () => {
         board: [],
 
         // Actual game stuff
-        tileIsSelected: false,
-        selectedTile: {
+        isStartSquareSelected: false,
+        selectedStartSquare: {
             x: 0,
             y: 0
         },
         enterDirection: 'across',
         enterOffset: 0, // Offset from the selected tile for entering new letters
-        playerTileSelected: false, // Normally an index into player1.tiles
+        // playerTileSelected: false, // Normally an index into player1.tiles
+        playedTiles: [], // The tiles that have been played in this move. Will be like { x: 0, y: 0, tileIndex: 'A'}
 
         init() {
             this.player1 = new Player(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 0)
@@ -234,25 +235,31 @@ document.addEventListener('alpine:init', () => {
             }
 
             // Set or toggle tile direction first
-            if (!this.tileSelected) {
+            if (!this.isStartSquareSelected) {
                 this.enterDirection = 'across';
-            } else {
+            } else if (x === this.selectedStartSquare.x && y === this.selectedStartSquare.y) {
                 this.enterDirection = this.enterDirection === 'across' ? 'down' : 'across';
             }
 
-            this.tileSelected = true;
-            this.selectedTile = { 'x': x, 'y': y };
+            this.isStartSquareSelected = true;
+            this.selectedStartSquare = { 'x': x, 'y': y };
+            // Remove played tiles
+            this.playedTiles.map((tile) => {
+                this.board[tile.y][tile.x] = '';
+            })
+
+            this.playedTiles = [];
         },
 
-        tileIsInEnterLine(x, y) {
-            if (!this.tileSelected) {
+        boardSquareIsInEnterLine(x, y) {
+            if (!this.isStartSquareSelected) {
                 return false;
             }
             if (this.enterDirection === 'across') {
-                return y === this.selectedTile.y && x >= this.selectedTile.x;
+                return y === this.selectedStartSquare.y && x >= this.selectedStartSquare.x;
             }
             if (this.enterDirection === 'down') {
-                return x === this.selectedTile.x && y >= this.selectedTile.y;
+                return x === this.selectedStartSquare.x && y >= this.selectedStartSquare.y;
             }
         },
 
@@ -264,20 +271,61 @@ document.addEventListener('alpine:init', () => {
          * @param {number} tile Index to tile
          */
         selectPlayerTile(tile) {
-            if (!this.tileSelected) {
-                this.playerTileSelected = tile;
+            if (!this.isStartSquareSelected) {
                 return
             }
 
             if (this.enterDirection === 'across') {
-                this.board[this.selectedTile.y][this.selectedTile.x + this.enterOffset] = this.player1.tiles[tile];
-                this.enterOffset++;
+                this.board[this.selectedStartSquare.y][this.selectedStartSquare.x + this.enterOffset] = this.player1.tiles[tile];
+                this.playedTiles = [...this.playedTiles, { x: this.selectedStartSquare.x + this.enterOffset, y: this.selectedStartSquare.y, tileIndex: tile }];
+                // Increment the offset until we're at the next empty space
+                while (this.board[this.selectedStartSquare.y][this.selectedStartSquare.x + this.enterOffset] !== '') {
+                    this.enterOffset++;
+                }
+
             }
 
             if (this.enterDirection === 'down') {
-                this.board[this.selectedTile.y + this.enterOffset][this.selectedTile.x] = this.player1.tiles[tile];
-                this.enterOffset++;
+                this.board[this.selectedStartSquare.y + this.enterOffset][this.selectedStartSquare.x] = this.player1.tiles[tile];
+                this.playedTiles = [...this.playedTiles, { x: this.selectedStartSquare.x, y: this.selectedStartSquare.y + this.enterOffset, tileIndex: tile }];
+                // Increment the offset until we're at the next empty space
+                while (this.board[this.selectedStartSquare.y + this.enterOffset][this.selectedStartSquare.x] !== '') {
+                    this.enterOffset++;
+                }
             }
+        },
+
+        /**
+         * Returns the indexes into the player1 tiles of the tiles that have been played
+         * on the board in this move.
+         *
+         * @returns {number[]} Indexes of tiles played
+         */
+        getPlayedTileIndexes() {
+            return this.playedTiles.map((tile) => tile.tileIndex);
+        },
+
+        /**
+         * Returns true if the tile at the specified index in the player's rack has been played
+         * in this move.
+         *
+         * @param {number} tileIndex Index of the tile in the player's rack
+         * @returns {boolean} True if the tile has been played
+         */
+        tileIsPlayed(tileIndex) {
+            return this.getPlayedTileIndexes().includes(tileIndex);
+        },
+
+        /**
+         * Returns true if the specified square on the board has a tile from the current move
+         * played on it.
+         *
+         * @param {number} x x-coordinate of board square to check
+         * @param {number} y y-coordinate of board square to check
+         * @returns {boolean} True if the square has a played tile on it
+         */
+        boardSquareIsPlayedTile(x, y) {
+            return this.playedTiles.some((tile) => tile.x === x && tile.y === y);
         }
     }))
 })
