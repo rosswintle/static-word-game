@@ -234,6 +234,10 @@ document.addEventListener('alpine:init', () => {
         copyButtonText: 'Copy link to clipboard',
 
         init() {
+            window.addEventListener('hashchange', () => {
+                window.location.reload();
+            })
+
             if (window.location.hash) {
                 this.decodeBase64(window.location.hash.substring(1));
                 this.removePlayerTilesFromLetterBag();
