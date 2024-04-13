@@ -15,6 +15,14 @@
  */
 
 class Move {
+    /**
+     * Construct a move
+     *
+     * @param {Boolean} acrossFlag True if the move is across, false if down
+     * @param {number} x The x coordinate (column) of the start of the move
+     * @param {number} y The y coordinate (row) of the start of the move
+     * @param {string} word The word played
+     */
     constructor(
         acrossFlag,
         x,
@@ -27,6 +35,11 @@ class Move {
         this.word = word
     }
 
+    /**
+     * Encodes the move as a coded BigInt
+     *
+     * @returns {CodedInt} The move encoded as a BigInt (wrapped in a CodedInt)
+     */
     encodeAsBigint() {
         let moveAsBigInt = new CodedInt(0n);
 
@@ -50,6 +63,12 @@ class Move {
         return moveAsBigInt;
     }
 
+    /**
+     * Static method to decode a Move from a BigInt
+     *
+     * @param {BigInt} codedSrc The BigInt to decode from
+     * @returns {Move} The move decoded from the BigInt
+     */
     static decodeFromBigInt(codedSrc) {
         let acrossFlag, y, x, length;
 
@@ -80,6 +99,14 @@ class Move {
         );
     }
 
+    /**
+     * Gets the number of bits required to encode this move.
+     *
+     * Across flag - 1 bit, x - 4 bits, y - 4 bits, length - 4 bits,
+     * word - 5 bits per letter
+     *
+     * @returns {Number} The number of bits required to encode this move
+     */
     getBitCount() {
         return 13 + this.word.length * 5;
     }

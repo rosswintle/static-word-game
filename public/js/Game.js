@@ -19,6 +19,7 @@
 
 class Game {
     /**
+     * Construct a game
      *
      * @param {Player} player2
      * @param {Player} player1
@@ -30,6 +31,11 @@ class Game {
         this.moves = moves;
     }
 
+    /**
+     * Encodes the game as a coded BigInt
+     *
+     * @returns {CodedInt} The game encoded as a BigInt (wrapped in a CodedInt)
+     */
     encodeAsBigint() {
         let gameAsBigInt = new CodedInt(0n);
 
@@ -47,8 +53,9 @@ class Game {
     }
 
     /**
+     * Static method to create a Game from a BigInt
      *
-     * @param {BigInt} coded
+     * @param {BigInt} coded The BigInt to decode from
      * @returns {Game}
      */
     static decodeFromBigInt(coded) {

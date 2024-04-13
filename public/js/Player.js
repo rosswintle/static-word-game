@@ -11,8 +11,8 @@
 class Player {
     /**
      *
-     * @param {String[]} tiles
-     * @param {Number} score
+     * @param {String[]} tiles Array of tiles that player has
+     * @param {Number} score   The player's score
      */
     constructor(
         tiles,
@@ -22,6 +22,11 @@ class Player {
         this.score = score
     }
 
+    /**
+     * Encodes the player as a coded BigInt
+     *
+     * @returns {CodedInt} The player encoded as a BigInt (wrapped in a CodedInt)
+     */
     encodeAsBigint() {
         let playerAsBigInt = new CodedInt(0n);
 
@@ -39,6 +44,12 @@ class Player {
         return playerAsBigInt
     }
 
+    /**
+     * Static method to create a Player from a BigInt
+     *
+     * @param {BigInt} codedSrc The BigInt to decode from
+     * @returns {Player} The player decoded from the BigInt
+     */
     static decodeFromBigInt(codedSrc) {
         let coded = new CodedInt(codedSrc);
         let tileCount = coded.popBits(3)
@@ -55,6 +66,13 @@ class Player {
         return new Player(tiles, score)
     }
 
+    /**
+     * Returns the number of bits required to encode this player.
+     *
+     * Score is 10 bits. Tiles are 5 bits each. Tile count is 3 bits.
+     *
+     * @returns {Number} The number of bits required to encode this player
+     */
     getBitCount() {
         return 13 + (this.tiles.length * 5)
     }
