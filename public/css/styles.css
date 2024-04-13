@@ -782,6 +782,10 @@ select {
   max-width: 56rem;
 }
 
+.max-w-md {
+  max-width: 28rem;
+}
+
 .flex-row {
   flex-direction: row;
 }

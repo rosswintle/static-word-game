@@ -256,6 +256,9 @@ document.addEventListener('alpine:init', () => {
             // Two shufffles seems to work better than one.
             shuffleArray(this.letterBag);
             shuffleArray(this.letterBag);
+            shuffleArray(this.letterBag);
+            shuffleArray(this.letterBag);
+            shuffleArray(this.letterBag);
             this.game.player1.topUpTiles(this.letterBag);
             this.game.player2.topUpTiles(this.letterBag);
         },

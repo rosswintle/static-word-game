@@ -1,7 +1,7 @@
 <?php extend('../templates/main.html', ['title' => 'Static Scrabble']) ?>
 
 <h1 class="mt-4 mb-1 text-3xl text-center">Static Word Game</h1>
-<p class="text-xs text-center mb-4">v0.21</p>
+<p class="text-xs text-center mb-4">v0.22</p>
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
 
@@ -31,7 +31,7 @@
         </template>
     </div>
 
-    <div id="enter-move-ui" class="w-full mt-4">
+    <div id="enter-move-ui" class="w-full max-w-md mt-4">
         <div id="enter-move-ui-title" class="flex justify-between items-center mb-2">
             <h2 class="font-bold">Your tiles</h2>
             <div>
@@ -39,7 +39,7 @@
                 <button class="px-2 py-1 border" @click="submitMove">Play</button>
             </div>
         </div>
-        <div class="mb-2 flex items-center">
+        <div class="mb-2 flex items-center justify-center">
             <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
                 <button :class="{
                             'relative w-11 h-11 leading-11 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
