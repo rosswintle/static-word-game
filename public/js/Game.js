@@ -75,4 +75,26 @@ class Game {
 
         return new Game(player1, player2, moves);
     }
+
+    /**
+     * This returns 1 if the current player is player 1, and 2 if the current player is player 2.
+     *
+     * This is determined by the number of moves played.
+     *
+     * @returns {Number}
+     */
+    getCurrentPlayerId() {
+        return this.moves.length % 2 === 0 ? 1 : 2;
+    }
+
+    /**
+     * Returns the current player object.
+     *
+     * This is determined by the number of moves played.
+     *
+     * @returns {Player} The current player
+     */
+    getCurrentPlayer() {
+        return this.getCurrentPlayerId() === 1 ? this.player1 : this.player2;
+    }
 }
