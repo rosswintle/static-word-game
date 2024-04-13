@@ -202,8 +202,9 @@ document.addEventListener('alpine:init', () => {
 
         // Actual game stuff
         letterBag: [...fullLetterBag],
-        // TODO: This needs to be set at the start for display purposes. It should not update once move is played.
-        currentPlayer: 1,
+        // This needs to be set at the start for display purposes. It should not update once move is played.
+        thisMovePlayerId: 1,
+        thisMovePlayer: null,
         isStartSquareSelected: false,
         selectedStartSquare: {
             x: 0,
@@ -219,13 +220,16 @@ document.addEventListener('alpine:init', () => {
                 this.base64code = window.location.hash.substring(1);
                 this.decodeBase64();
                 this.removePlayerTilesFromLetterBag();
+                this.thisMovePlayerId = this.game.getCurrentPlayerId();
+                this.thisMovePlayer = this.game.getCurrentPlayer();
                 //
             } else {
                 this.emptyBoard();
                 this.player1 = new Player([], 0)
                 this.player2 = new Player([], 0)
-                this.currentPlayer = 1;
                 this.game = new Game(this.player1, this.player2, [])
+                this.thisMovePlayerId = 1;
+                this.thisMovePlayer = this.game.player1
             }
             // TODO: Randomness needs to be predictable. Maybe based on the hash?
             this.player1.topUpTiles(this.letterBag);
@@ -307,7 +311,6 @@ document.addEventListener('alpine:init', () => {
                         }
                     }
                 }
-                this.toggleCurrentPlayer();
             })
         },
 
@@ -474,11 +477,18 @@ document.addEventListener('alpine:init', () => {
                 }
             }
 
-            // TODO: Score the word
+            // Score the word and remove tiles from players rack
+            const player = this.game.getCurrentPlayer();
+
+            let playedTileIndexes = this.getPlayedTileIndexes();
+            playedTileIndexes.forEach((tileIndex) => {
+                player.score += letterValues[player.tiles[tileIndex]];
+            })
+            player.tiles = player.tiles.filter((tile, index) => !playedTileIndexes.includes(index));
+            this.playedTiles = [];
+
             this.game.moves.push(new Move(across, x, y, wordPlayed));
             this.isStartSquareSelected = false;
-            const player = this.game.getCurrentPlayer();
-            player.tiles = player.tiles.filter((tile, index) => !this.getPlayedTileIndexes().includes(index));
         }
     }))
 })

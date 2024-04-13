@@ -77,7 +77,12 @@
         </div>
 
         <div id="right-container">
-            <h2 class="text-center" x-text="'You are player ' + game.getCurrentPlayerId()"></h2>
+
+            <h2 class="text-center" x-text="'You are player ' + thisMovePlayerId"></h2>
+
+            <p>Scores: Player 1: <span x-text="game.player1.score"></span> |
+                Player 2: <span x-text="game.player2.score"></span></p>
+
             <div id="board" class="flex flex-col">
                 <template x-for="(row, rowIndex) in board" :key="`row-${rowIndex}`">
                     <div class="flex flex-row">
@@ -102,7 +107,7 @@
                     </div>
                 </div>
                 <div class="mb-2 flex items-center">
-                    <template x-for="(tile, index) in game.getCurrentPlayer().tiles" :key="`tile-${index}`">
+                    <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
                         <button :class="{
                                 'w-6 h-6 leading-6 text-center border border-grey-300 mx-2': true,
                                 'bg-blue-200': tileIsPlayed(index)

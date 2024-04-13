@@ -61,7 +61,7 @@ class Player {
             tiles.push(tile)
         }
 
-        let score = coded.popBits(10)
+        let score = Number(coded.popBits(10))
 
         return new Player(tiles, score)
     }
