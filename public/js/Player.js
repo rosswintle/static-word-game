@@ -78,14 +78,14 @@ class Player {
     }
 
     /**
-     * Tops up the player's tiles from the provided letter bag
+     * Tops up the player's tiles from the provided letter bag.
+     *
+     * Assumes the letter bag is randomized.
      *
      * @param {String[]} letterBag The letter bag to top up from
      */
     topUpTiles(letterBag) {
         let tilesNeeded = 7 - this.tiles.length
-        // Shuffle the letter bag
-        letterBag.sort(() => Math.random() - 0.5)
         for (let i = 0; i < tilesNeeded; i++) {
             this.tiles.push(letterBag.pop())
         }
