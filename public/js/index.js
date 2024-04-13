@@ -480,6 +480,10 @@ document.addEventListener('alpine:init', () => {
 
         browserHasShareApi() {
             return navigator.share !== undefined;
+        },
+
+        shareGameUrl() {
+            navigator.share({ url: getGameUrl(), text: 'Your turn!' })
         }
     }))
 })

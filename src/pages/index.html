@@ -55,8 +55,8 @@
         <p class="mb-2">Copy the game link below and share it with the other player.</p>
         <div class="flex justify-center mb-4">
             <button @click="copyGameUrl()" class="block px-4 py-2 mb-2 mr-2 border" x-text="copyButtonText"></button>
-            <button x-show="browserHasShareApi()" @click="navigator.share({url: getGameUrl(), text: 'Your turn!'})"
-                class="block px-4 py-2 mb-2 border ">Share link</button>
+            <button x-show="browserHasShareApi()" @click="shareGameUrl()" class="block px-4 py-2 mb-2 border ">Share
+                link</button>
         </div>
         <span class="block px-4 py-2 border break-all"
             x-text="window.location.origin + '/#' + game.encodeAsBigint().toBase64()">
