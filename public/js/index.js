@@ -184,6 +184,33 @@ const letterValues = {
     Z: 10
 }
 
+/**
+ * This is a random number generator generator (!!) that is seeded with a number.
+ *
+ * From: https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+ *
+ * @param {number} seed - the seed to use for the random number generator
+ * @return {() => number} - a seeded random number generator function
+ */
+function mulberry32(seed) {
+    return function () {
+        var t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+const seed = Math.floor(Math.random() * 10_000_000_000)
+const getRandom = mulberry32(this.seed)
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(getRandom() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('scrabble', () => ({
         game: null,
@@ -222,6 +249,9 @@ document.addEventListener('alpine:init', () => {
                 this.thisMovePlayer = this.game.player1
             }
             // TODO: Randomness needs to be predictable. Maybe based on the hash?
+            // Two shufffles seems to work better than one.
+            shuffleArray(this.letterBag);
+            shuffleArray(this.letterBag);
             this.game.player1.topUpTiles(this.letterBag);
             this.game.player2.topUpTiles(this.letterBag);
         },
@@ -459,6 +489,7 @@ document.addEventListener('alpine:init', () => {
                 player.score += letterValues[player.tiles[tileIndex]];
             })
             player.tiles = player.tiles.filter((tile, index) => !playedTileIndexes.includes(index));
+            this.game.getCurrentPlayer().topUpTiles(this.letterBag);
             this.playedTiles = [];
 
             this.game.moves.push(new Move(across, x, y, wordPlayed));
