@@ -482,8 +482,8 @@ document.addEventListener('alpine:init', () => {
             return navigator.share !== undefined;
         },
 
-        shareGameUrl() {
-            navigator.share({ url: getGameUrl(), text: 'Your turn!' })
+        async shareGameUrl() {
+            await navigator.share({ url: this.getGameUrl(), text: 'Your turn!' })
         }
     }))
 })
