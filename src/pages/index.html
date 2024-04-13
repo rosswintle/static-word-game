@@ -2,7 +2,7 @@
 
 <h1 class="mt-8 mb-4 text-3xl text-center">Static Word Game</h1>
 
-<div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center">
+<div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
 
     <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone. Endcoded game data is passed between
         players in
@@ -41,7 +41,7 @@
         <div class="mb-2 flex items-center">
             <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
                 <button :class="{
-                            'relative w-12 h-12 leading-12 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
+                            'relative w-11 h-11 leading-11 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
                             'bg-blue-200': tileIsPlayed(index)
                         }" @click="selectPlayerTile(index)">
                     <span class="" x-text="tile"></span>
@@ -53,7 +53,7 @@
 
     <div class="mt-4 text-center" x-show="moveIsPlayed">
         <p class="mb-2">Copy the link below and share it with the other player.</p>
-        <a class="block px-4 py-2 border" :href="'/#' + game.encodeAsBigint().toBase64()"
+        <a class="block px-4 py-2 border break-all" :href="'/#' + game.encodeAsBigint().toBase64()"
             x-text="window.location.origin + '/#' + game.encodeAsBigint().toBase64()">
         </a>
     </div>
