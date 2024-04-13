@@ -186,18 +186,8 @@ const letterValues = {
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('scrabble', () => ({
-        newAcrossFlag: false,
-        newX: 0,
-        newY: 0,
-        newWord: '',
         game: null,
-        player1: null,
-        player2: null,
         base64code: '',
-        p1Score: 0,
-        p1Tiles: '',
-        p2Score: 0,
-        p2Tiles: '',
         board: [],
 
         // Actual game stuff
@@ -214,6 +204,7 @@ document.addEventListener('alpine:init', () => {
         enterOffset: 0, // Offset from the selected tile for entering new letters
         // playerTileSelected: false, // Normally an index into player1.tiles
         playedTiles: [], // The tiles that have been played in this move. Will be like { x: 0, y: 0, tileIndex: 'A'}
+        moveIsPlayed: false,
 
         init() {
             if (window.location.hash) {
@@ -225,15 +216,15 @@ document.addEventListener('alpine:init', () => {
                 //
             } else {
                 this.emptyBoard();
-                this.player1 = new Player([], 0)
-                this.player2 = new Player([], 0)
-                this.game = new Game(this.player1, this.player2, [])
+                const player1 = new Player([], 0)
+                const player2 = new Player([], 0)
+                this.game = new Game(player1, player2, [])
                 this.thisMovePlayerId = 1;
                 this.thisMovePlayer = this.game.player1
             }
             // TODO: Randomness needs to be predictable. Maybe based on the hash?
-            this.player1.topUpTiles(this.letterBag);
-            this.player2.topUpTiles(this.letterBag);
+            this.game.player1.topUpTiles(this.letterBag);
+            this.game.player2.topUpTiles(this.letterBag);
         },
 
         emptyBoard() {
@@ -246,49 +237,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         removePlayerTilesFromLetterBag() {
-            this.player1.tiles.forEach((tile) => {
+            this.game.player1.tiles.forEach((tile) => {
                 this.removeFromLetterBag(tile);
             });
-            this.player2.tiles.forEach((tile) => {
+            this.game.player2.tiles.forEach((tile) => {
                 this.removeFromLetterBag(tile);
             });
-        },
-
-        addNewWord() {
-            this.game.moves.push(
-                new Move(
-                    this.newAcrossFlag === '1' || this.newAcrossFlag === 'true',
-                    this.newX,
-                    this.newY,
-                    this.newWord,
-                )
-            );
-            this.newWord = '';
-            this.newX = 0;
-            this.newY = 0;
         },
 
         decodeBase64() {
             this.game = Game.decodeFromBigInt(CodedInt.fromBase64(this.base64code).getValue())
-            this.player1 = this.game.player1
-            this.player2 = this.game.player2
-            this.p1Score = this.player1.score
-            this.p1Tiles = this.player1.tiles.join('')
-            this.p2Score = this.player2.score
-            this.p2Tiles = this.player2.tiles.join('')
-            console.log(this.game.moves)
             this.game.moves = [...this.game.moves] // Force reactivity
             this.replayMovesToBoard();
-        },
-
-        updateP1() {
-            this.player1 = new Player(this.p1Tiles.split(''), this.p1Score)
-            this.game.player1 = this.player1
-        },
-
-        updateP2() {
-            this.player2 = new Player(this.p2Tiles.split(''), this.p2Score)
-            this.game.player2 = this.player2
         },
 
         replayMovesToBoard() {
@@ -321,15 +281,15 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        toggleCurrentPlayer() {
-            this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
-        },
-
         tileHasLetter(x, y) {
             return this.board[y][x] !== '';
         },
 
         tileClick(x, y) {
+            if (this.moveIsPlayed) {
+                return;
+            }
+
             // Set or toggle tile direction first
             if (!this.isStartSquareSelected) {
                 this.enterDirection = 'across';
@@ -389,7 +349,7 @@ document.addEventListener('alpine:init', () => {
          * @param {number} tile Index to tile
          */
         selectPlayerTile(tile) {
-            if (!this.isStartSquareSelected) {
+            if (!this.isStartSquareSelected || this.moveIsPlayed) {
                 return
             }
 
