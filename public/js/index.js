@@ -227,6 +227,13 @@ document.addEventListener('alpine:init', () => {
             this.game.player2.topUpTiles(this.letterBag);
         },
 
+        otherPlayerScore() {
+            if (this.thisMovePlayerId === 1) {
+                return this.game.player2.score;
+            }
+            return this.game.player1.score;
+        },
+
         emptyBoard() {
             this.board = Array(15).fill([]);
             let emptyRow = Array(15).fill('');
@@ -317,6 +324,10 @@ document.addEventListener('alpine:init', () => {
                     this.enterOffset++;
                 }
             }
+        },
+
+        boardSquareIsCenterSquare(x, y) {
+            return x === 7 && y === 7;
         },
 
         boardSquareIsCurrentEnterPoint(x, y) {
@@ -424,6 +435,10 @@ document.addEventListener('alpine:init', () => {
         },
 
         submitMove() {
+            if (this.moveIsPlayed) {
+                return;
+            }
+
             let x = this.selectedStartSquare.x;
             let y = this.selectedStartSquare.y;
             let across = this.enterDirection === 'across';
@@ -449,6 +464,7 @@ document.addEventListener('alpine:init', () => {
 
             this.game.moves.push(new Move(across, x, y, wordPlayed));
             this.isStartSquareSelected = false;
+            this.moveIsPlayed = true;
         }
     }))
 })

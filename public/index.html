@@ -31,83 +31,76 @@
 
 <body>
     
+<h1 class="mt-8 mb-4 text-3xl text-center">Static Word Game</h1>
 
-<h1 class="mt-8 mb-8 text-6xl text-center">Static Scrabble!</h1>
+<div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center">
 
-<div x-data="scrabble" class="w-full max-w-4xl mx-auto">
-    <div id="left-right-container" class="grid grid-cols-2 grid-rows-1">
+    <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone. Endcoded game data is passed between
+        players in
+        the URL. Enjoy!</p>
 
-        <div id="right-container">
+    <h2 class="text-center mb-2" x-text="'Welcome, Player ' + thisMovePlayerId"></h2>
 
-            <h2 class="text-center" x-text="'You are player ' + thisMovePlayerId"></h2>
+    <p class="mb-2">Your score: <span x-text="thisMovePlayer.score"></span> | Opponent score: <span
+            x-text="otherPlayerScore()"></span></p>
+    </p>
 
-            <p>Scores: Player 1: <span x-text="game.player1.score"></span> |
-                Player 2: <span x-text="game.player2.score"></span></p>
-
-            <div id="board" class="flex flex-col">
-                <template x-for="(row, rowIndex) in board" :key="`row-${rowIndex}`">
-                    <div class="flex flex-row">
-                        <template x-for="(tile, colIndex) in row" :key="`tile-${colIndex}`">
-                            <button :class="{
-                                'border border-gray-300 w-6 h-6 leading-6 text-center' : true,
-                                'bg-blue-200' : boardSquareIsInEnterLine(colIndex, rowIndex),
-                                'bg-blue-300': boardSquareIsPlayedTile(colIndex, rowIndex),
-                                'bg-blue-500 text-white' : boardSquareIsCurrentEnterPoint(colIndex, rowIndex)
-                            }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
-                        </template>
-                    </div>
+    <div id="board" class="flex flex-col">
+        <template x-for="(row, rowIndex) in board" :key="`row-${rowIndex}`">
+            <div class="flex flex-row">
+                <template x-for="(tile, colIndex) in row" :key="`tile-${colIndex}`">
+                    <button :class="{
+                            'border border-gray-300 w-6 h-6 leading-6 text-center' : true,
+                            'bg-pink-200' : boardSquareIsCenterSquare(colIndex, rowIndex),
+                            'bg-blue-200' : boardSquareIsInEnterLine(colIndex, rowIndex),
+                            'bg-blue-300': boardSquareIsPlayedTile(colIndex, rowIndex),
+                            'bg-blue-500 text-white' : boardSquareIsCurrentEnterPoint(colIndex, rowIndex)
+                        }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
                 </template>
             </div>
+        </template>
+    </div>
 
-            <div id="enter-move-ui" class="mt-4">
-                <div id="enter-move-ui-title" class="flex justify-between">
-                    <h2 class="font-bold mb-2">Your tiles</h2>
-                    <div>
-                        <button class="" @click="clearMove">Clear</button>
-                        | <button class="" @click="submitMove">Submit</button>
-                    </div>
-                </div>
-                <div class="mb-2 flex items-center">
-                    <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
-                        <button :class="{
-                                'w-6 h-6 leading-6 text-center border border-grey-300 mx-2': true,
-                                'bg-blue-200': tileIsPlayed(index)
-                            }" @click="selectPlayerTile(index)" <span x-text="tile"></span>
-                        </button>
-                    </template>
-                </div>
+    <div id="enter-move-ui" class="mt-4">
+        <div id="enter-move-ui-title" class="flex justify-between items-center mb-2">
+            <h2 class="font-bold">Your tiles</h2>
+            <div>
+                <button class="px-2 py-1 border" @click="clearMove">Clear</button>
+                <button class="px-2 py-1 border" @click="submitMove">Submit</button>
             </div>
-
-            <div id="output-ui" class="mt-4">
-                <h3 class="font-bold">Moves</h3>
-                <ul class="mb-4">
-                    <template x-for="(move, index) in game.moves" :key="`move-${index}`">
-                        <li>
-                            Across: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span>
-                            | X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span>
-                            | Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span>
-                            | Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span>
-                        </li>
-                    </template>
-                </ul>
-                <!-- Encoded move: <span x-text="move.encodeAsBigint().toString()"></span><br>
-            Decoded move: Across? <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span><br>
-            X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span><br>
-            Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span><br>
-            Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span><br>
-            <br>
-            ASCII: <span x-text="move.encodeAsBigint().toAscii()"></span><br>
-            From ASCII (Should be same as Encoded): <span
-                x-text="CodedInt.fromAscii(move.encodeAsBigint().toAscii()).toString()"></span><br>
-            <br> -->
-                Game Base64 (<span x-text="game.encodeAsBigint().toBase64().length"></span>):
-                <a :href="'/#' + game.encodeAsBigint().toBase64()">
-                    <code x-text="game.encodeAsBigint().toBase64()"></code></a><br>
-                <!-- From Base64 (Should be same as Encoded): <span
-                x-text="CodedInt.fromBase64(move.encodeAsBigint().toBase64()).toString()"></span><br> -->
-            </div>
-
         </div>
+        <div class="mb-2 flex items-center">
+            <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
+                <button :class="{
+                            'relative w-12 h-12 leading-12 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
+                            'bg-blue-200': tileIsPlayed(index)
+                        }" @click="selectPlayerTile(index)">
+                    <span class="" x-text="tile"></span>
+                    <span class="absolute bottom-0.5 right-1 text-xs font-normal" x-text="letterValues[tile]"></span>
+                </button>
+            </template>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center" x-show="moveIsPlayed">
+        <p class="mb-2">Copy the link below and share it with the other player.</p>
+        <a class="block px-4 py-2 border" :href="'/#' + game.encodeAsBigint().toBase64()"
+            x-text="window.location.origin + '/#' + game.encodeAsBigint().toBase64()">
+        </a>
+    </div>
+
+    <div id="output-ui" class="mt-4">
+        <h3 class="font-bold">Moves</h3>
+        <ul class="mb-4">
+            <template x-for="(move, index) in game.moves" :key="`move-${index}`">
+                <li>
+                    Across: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span>
+                    | X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span>
+                    | Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span>
+                    | Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span>
+                </li>
+            </template>
+        </ul>
     </div>
 </div>
 
