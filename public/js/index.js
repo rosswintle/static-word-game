@@ -202,7 +202,7 @@ function mulberry32(seed) {
 }
 
 const seed = Math.floor(Math.random() * 10_000_000_000)
-const getRandom = mulberry32(this.seed)
+const getRandom = mulberry32(seed)
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -253,11 +253,6 @@ document.addEventListener('alpine:init', () => {
                 this.thisMovePlayer = this.game.player1
             }
             // TODO: Randomness needs to be predictable. Maybe based on the hash?
-            // Two shufffles seems to work better than one.
-            shuffleArray(this.letterBag);
-            shuffleArray(this.letterBag);
-            shuffleArray(this.letterBag);
-            shuffleArray(this.letterBag);
             shuffleArray(this.letterBag);
             this.game.player1.topUpTiles(this.letterBag);
             this.game.player2.topUpTiles(this.letterBag);
