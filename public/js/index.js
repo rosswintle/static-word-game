@@ -187,7 +187,6 @@ const letterValues = {
 document.addEventListener('alpine:init', () => {
     Alpine.data('scrabble', () => ({
         game: null,
-        base64code: '',
         board: [],
 
         // Actual game stuff
@@ -205,11 +204,11 @@ document.addEventListener('alpine:init', () => {
         // playerTileSelected: false, // Normally an index into player1.tiles
         playedTiles: [], // The tiles that have been played in this move. Will be like { x: 0, y: 0, tileIndex: 'A'}
         moveIsPlayed: false,
+        copyButtonText: 'Copy link to clipboard',
 
         init() {
             if (window.location.hash) {
-                this.base64code = window.location.hash.substring(1);
-                this.decodeBase64();
+                this.decodeBase64(window.location.hash.substring(1));
                 this.removePlayerTilesFromLetterBag();
                 this.thisMovePlayerId = this.game.getCurrentPlayerId();
                 this.thisMovePlayer = this.game.getCurrentPlayer();
@@ -252,8 +251,8 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
-        decodeBase64() {
-            this.game = Game.decodeFromBigInt(CodedInt.fromBase64(this.base64code).getValue())
+        decodeBase64(base64code) {
+            this.game = Game.decodeFromBigInt(CodedInt.fromBase64(base64code).getValue())
             this.game.moves = [...this.game.moves] // Force reactivity
             this.replayMovesToBoard();
         },
@@ -465,6 +464,22 @@ document.addEventListener('alpine:init', () => {
             this.game.moves.push(new Move(across, x, y, wordPlayed));
             this.isStartSquareSelected = false;
             this.moveIsPlayed = true;
+        },
+
+        getGameUrl() {
+            return window.location.origin + '/#' + this.game.encodeAsBigint().toBase64();
+        },
+
+        copyGameUrl() {
+            this.$clipboard(this.getGameUrl());
+            this.copyButtonText = 'Copied!';
+            setTimeout(() => {
+                this.copyButtonText = 'Copy link to clipboard';
+            }, 3000);
+        },
+
+        browserHasShareApi() {
+            return navigator.share !== undefined;
         }
     }))
 })
