@@ -395,7 +395,7 @@ document.addEventListener('alpine:init', () => {
                 return
             }
 
-            if (this.tileIsPlayed(tile)) {
+            if (this.tileIsPlayed(tile) || this.enterOffsetIsOffBoard()) {
                 return;
             }
 
@@ -403,7 +403,10 @@ document.addEventListener('alpine:init', () => {
                 this.board[this.selectedStartSquare.y][this.selectedStartSquare.x + this.enterOffset] = this.game.getCurrentPlayer().tiles[tile];
                 this.playedTiles = [...this.playedTiles, { x: this.selectedStartSquare.x + this.enterOffset, y: this.selectedStartSquare.y, tileIndex: tile }];
                 // Increment the offset until we're at the next empty space
-                while (this.board[this.selectedStartSquare.y][this.selectedStartSquare.x + this.enterOffset] !== '') {
+                while (
+                    this.selectedStartSquare.x + this.enterOffset < 15 &&
+                    this.board[this.selectedStartSquare.y][this.selectedStartSquare.x + this.enterOffset] !== ''
+                ) {
                     this.enterOffset++;
                 }
 
@@ -413,10 +416,20 @@ document.addEventListener('alpine:init', () => {
                 this.board[this.selectedStartSquare.y + this.enterOffset][this.selectedStartSquare.x] = this.game.getCurrentPlayer().tiles[tile];
                 this.playedTiles = [...this.playedTiles, { x: this.selectedStartSquare.x, y: this.selectedStartSquare.y + this.enterOffset, tileIndex: tile }];
                 // Increment the offset until we're at the next empty space
-                while (this.board[this.selectedStartSquare.y + this.enterOffset][this.selectedStartSquare.x] !== '') {
+                while (
+                    this.selectedStartSquare.y + this.enterOffset < 15 &&
+                    this.board[this.selectedStartSquare.y + this.enterOffset][this.selectedStartSquare.x] !== ''
+                ) {
                     this.enterOffset++;
                 }
             }
+        },
+
+        enterOffsetIsOffBoard() {
+            if (this.enterDirection === 'across') {
+                return this.selectedStartSquare.x + this.enterOffset >= 15;
+            }
+            return this.selectedStartSquare.y + this.enterOffset >= 15;
         },
 
         /**
