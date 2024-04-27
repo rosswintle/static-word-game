@@ -292,25 +292,137 @@ document.addEventListener('alpine:init', () => {
         replayMovesToBoard() {
             this.emptyBoard();
             this.game.moves.forEach((move) => {
-                let x = move.x
-                let y = move.y
-                let word = move.word
-                let across = move.acrossFlag
-                for (let i = 0; i < word.length; i++) {
-                    if (across) {
-                        if (this.board[y][x + i] === '') {
-                            this.board[y][x + i] = word[i]
-                            this.removeFromLetterBag(word[i])
-                        }
-                    } else {
-                        if (this.board[y + i][x] === '') {
-                            this.board[y + i][x] = word[i]
-                            this.removeFromLetterBag(word[i])
-                        }
-                    }
-                }
+                this.playMoveToBoard(move);
+                // Remove the played tiles from the letter bag
+                // TODO: This will remove already played tiles from the bag. This is not ideal.
+                // Maybe tell playMoveToBoard to remove tiles from the bag when played?
+                move.word.split('').forEach((letter) => {
+                    this.removeFromLetterBag(letter);
+                })
             })
         },
+
+        /**
+         * Plays a move to the board. This will update the board and return the score for the move.
+         *
+         * Does NOT affect the tile bag or the player's rack.
+         *
+         * @param {Move} move The move to play
+         * @returns {number} The score for the move
+         */
+        playMoveToBoard(move) {
+            let score = 0;
+
+            let x = move.x
+            let y = move.y
+            let word = move.word
+            let across = move.acrossFlag
+
+            for (let i = 0; i < word.length; i++) {
+                if (across) {
+                    // Be sure to skip over any tiles that have already been played (unless we just played it!)
+                    if (this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)) {
+                        score += this.playLetterToBoard(x + i, y, word[i], across)
+                    }
+                } else {
+                    // Be sure to skip over any tiles that have already been played (unless we just played it!)
+                    if (this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)) {
+                        score += this.playLetterToBoard(x, y + i, word[i], across)
+                    }
+                }
+            }
+
+            return score;
+        },
+
+        /**
+         * Plays the letter to the board at the specified coordinates. Returns the score for playing the
+         * letter, including any perpendicular words formed.
+         *
+         * @param {number} x The x coordinate
+         * @param {number} y The y coordinate
+         * @param {string} letter The letter to play
+         * @param {boolean} across True if the word is across
+         * @return {number} Score for playing the letter, including any perpendicular words
+         */
+        playLetterToBoard(x, y, letter, across) {
+            let score = letterValues[letter];
+
+            this.board[y][x] = letter;
+
+            if (across) {
+                score += this.maybeScoreVerticalWord(x, y);
+            } else {
+                score += this.maybeScoreHorizontalWord(x, y);
+            }
+
+            return score;
+        },
+
+        /**
+         * Scores a word played vertically around the specified coordinates. Returns the score for the word.
+         *
+         * @param {number} x The x coordinate
+         * @param {number} y The y coordinate
+         * @return {number} Score for the word played
+         */
+        maybeScoreVerticalWord(x, y) {
+            let score = 0;
+
+            // Find the start of the word
+            let start = y;
+            while (start > 0 && this.board[start - 1][x] !== '') {
+                start--;
+            }
+
+            // Find the end of the word
+            let end = y;
+            while (end < 14 && this.board[end + 1][x] !== '') {
+                end++;
+            }
+
+            // Only score the word if it's more than one letter long
+            if (start !== end) {
+                for (let i = start; i <= end; i++) {
+                    score += letterValues[this.board[i][x]];
+                }
+            }
+
+            return score;
+        },
+
+        /**
+         * Scores a word played horizontally around the specified coordinates. Returns the score for the word.
+         *
+         * @param {number} x The x coordinate
+         * @param {number} y The y coordinate
+         * @return {number} Score for the word played
+         */
+        maybeScoreHorizontalWord(x, y) {
+            let score = 0;
+
+            // Find the start of the word
+            let start = x;
+            while (start > 0 && this.board[y][start - 1] !== '') {
+                start--;
+            }
+
+            // Find the end of the word
+            let end = x;
+            while (end < 14 && this.board[y][end + 1] !== '') {
+                end++;
+            }
+
+            // Only score the word if it's more than one letter long
+            if (start !== end) {
+                for (let i = start; i <= end; i++) {
+                    score += letterValues[this.board[y][i]];
+                }
+            }
+
+            return score;
+        },
+
 
         removeFromLetterBag(letter) {
             let index = this.letterBag.indexOf(letter)
@@ -483,6 +595,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
+            // Use the start and the current enter offset to figure out the played word
             let x = this.selectedStartSquare.x;
             let y = this.selectedStartSquare.y;
             let across = this.enterDirection === 'across';
@@ -496,18 +609,28 @@ document.addEventListener('alpine:init', () => {
                 }
             }
 
-            // Score the word and remove tiles from players rack
-            const player = this.game.getCurrentPlayer();
+            // Construct a move object
+            const thisMove = new Move(
+                this.enterDirection === 'across',
+                this.selectedStartSquare.x,
+                this.selectedStartSquare.y,
+                wordPlayed
+            );
 
+            // This will "replay" the move to the board, but re-uses that functionality to score the move
+            const score = this.playMoveToBoard(thisMove);
+
+            // Add the score to the player's total
+            const player = this.game.getCurrentPlayer();
+            player.score += score;
+
+            // Remove the played tiles from the player's rack
             let playedTileIndexes = this.getPlayedTileIndexes();
-            playedTileIndexes.forEach((tileIndex) => {
-                player.score += letterValues[player.tiles[tileIndex]];
-            })
             player.tiles = player.tiles.filter((tile, index) => !playedTileIndexes.includes(index));
             this.game.getCurrentPlayer().topUpTiles(this.letterBag);
             this.playedTiles = [];
 
-            this.game.moves.push(new Move(across, x, y, wordPlayed));
+            this.game.moves.push(thisMove);
             this.isStartSquareSelected = false;
             this.moveIsPlayed = true;
         },
