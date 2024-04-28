@@ -320,15 +320,13 @@ document.addEventListener('alpine:init', () => {
 
             for (let i = 0; i < word.length; i++) {
                 if (across) {
-                    // Be sure to skip over any tiles that have already been played (unless we just played it!)
-                    if (this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)) {
-                        score += this.playLetterToBoard(x + i, y, word[i], across)
-                    }
+                    // Only score perpendicular words if we're playing the tile
+                    scorePerpendicularWords = this.boardSquareIsPlayedTile(x + i, y)
+                    score += this.playLetterToBoard(x + i, y, word[i], across, scorePerpendicularWords);
                 } else {
-                    // Be sure to skip over any tiles that have already been played (unless we just played it!)
-                    if (this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)) {
-                        score += this.playLetterToBoard(x, y + i, word[i], across)
-                    }
+                    // Only score perpendicular words if we're playing the tile
+                    scorePerpendicularWords = this.boardSquareIsPlayedTile(x, y + i)
+                    score += this.playLetterToBoard(x, y + i, word[i], across, scorePerpendicularWords);
                 }
             }
 
@@ -343,17 +341,20 @@ document.addEventListener('alpine:init', () => {
          * @param {number} y The y coordinate
          * @param {string} letter The letter to play
          * @param {boolean} across True if the word is across
+         * @param {boolean} scorePerpendicularWords True if perpendicular words should be scored
          * @return {number} Score for playing the letter, including any perpendicular words
          */
-        playLetterToBoard(x, y, letter, across) {
+        playLetterToBoard(x, y, letter, across, scorePerpendicularWords) {
             let score = letterValues[letter];
 
             this.board[y][x] = letter;
 
-            if (across) {
-                score += this.maybeScoreVerticalWord(x, y);
-            } else {
-                score += this.maybeScoreHorizontalWord(x, y);
+            if (scorePerpendicularWords) {
+                if (across) {
+                    score += this.maybeScoreVerticalWord(x, y);
+                } else {
+                    score += this.maybeScoreHorizontalWord(x, y);
+                }
             }
 
             return score;
@@ -590,6 +591,95 @@ document.addEventListener('alpine:init', () => {
             this.isStartSquareSelected = false;
         },
 
+        /**
+         * Returns the word played across with the current move. It will include any
+         * adjacent tiles that the word was played against. It will also adjust the
+         * start square to the start of the word if it was played against existing tiles.
+         *
+         * @returns {Move} A move object representing the played move
+         */
+        getWordPlayedAcross() {
+            let x = this.selectedStartSquare.x;
+            const y = this.selectedStartSquare.y;
+
+            // Find the start of the word
+            let start = x;
+            while (start > 0 && this.board[y][start - 1] !== '') {
+                start--;
+            }
+
+            // Find the end of the word
+            let end = x;
+            while (end < 14 && this.board[y][end + 1] !== '') {
+                end++;
+            }
+
+            let wordPlayed = '';
+            for (let i = start; i <= end; i++) {
+                wordPlayed += this.board[y][i];
+            }
+
+            // Construct a move object
+            return new Move(
+                true,
+                start,
+                y,
+                wordPlayed
+            );
+        },
+
+        /**
+         * Returns the word played down with the current move. It will include any
+         * adjacent tiles that the word was played against. It will also adjust the
+         * start square to the start of the word if it was played against existing tiles.
+         *
+         * @returns {Move} A move object representing the played move
+         */
+        getWordPlayedDown() {
+            const x = this.selectedStartSquare.x;
+            let y = this.selectedStartSquare.y;
+
+            // Find the start of the word
+            let start = y;
+            while (start > 0 && this.board[start - 1][x] !== '') {
+                start--;
+            }
+
+            // Find the end of the word
+            let end = y;
+            while (end < 14 && this.board[end + 1][x] !== '') {
+                end++;
+            }
+
+            let wordPlayed = '';
+            for (let i = start; i <= end; i++) {
+                wordPlayed += this.board[i][x];
+            }
+
+            // Construct a move object
+            return new Move(
+                false,
+                x,
+                start,
+                wordPlayed
+            );
+        },
+
+        /**
+         * This returns the word played with the currrent move. It will include any
+         * adjacent tiles that the word was played against. It will also adjust the
+         * start square to the start of the word if it was played against existing tiles.
+         *
+         * @returns {string} The word played with the current move
+         */
+        getWordPlayedAsMove() {
+            if (this.enterDirection === 'across') {
+                return this.getWordPlayedAcross();
+            } else {
+                return this.getWordPlayedDown();
+            }
+        },
+
         submitMove() {
             if (this.moveIsPlayed) {
                 return;
@@ -599,23 +689,10 @@ document.addEventListener('alpine:init', () => {
             let x = this.selectedStartSquare.x;
             let y = this.selectedStartSquare.y;
             let across = this.enterDirection === 'across';
-            let wordPlayed = '';
 
-            for (let i = 0; i < this.enterOffset; i++) {
-                if (across) {
-                    wordPlayed += this.board[y][x + i];
-                } else {
-                    wordPlayed += this.board[y + i][x];
-                }
-            }
-
-            // Construct a move object
-            const thisMove = new Move(
-                this.enterDirection === 'across',
-                this.selectedStartSquare.x,
-                this.selectedStartSquare.y,
-                wordPlayed
-            );
+            // This will figure out the full word played and adjust the start square to the start of the word
+            // if it was played against existing tiles
+            const thisMove = this.getWordPlayedAsMove();
 
             // This will "replay" the move to the board, but re-uses that functionality to score the move
             const score = this.playMoveToBoard(thisMove);
