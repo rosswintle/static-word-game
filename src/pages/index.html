@@ -1,13 +1,15 @@
 <?php extend('../templates/main.html', ['title' => 'Static Scrabble']) ?>
 
 <h1 class="mt-4 mb-1 text-3xl text-center">Static Word Game</h1>
-<p class="text-xs text-center mb-4">v0.27</p>
+<p class="text-xs text-center mb-4">v0.29
+    - <a class="underline" href="https://github.com/rosswintle/static-word-game/">GitHub</a>
+    - <a class="underline" href="https://ko-fi.com/magicroundabout">Buy me a coffee</a>
+</p>
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
 
-    <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone. Endcoded game data is passed between
-        players in
-        the URL. Enjoy!</p>
+    <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone.<br>
+        Endcoded game data is passed between players in the URL. Enjoy!</p>
 
     <h2 class="text-center mb-2" x-text="'Welcome, Player ' + thisMovePlayerId"></h2>
 
@@ -65,17 +67,25 @@
     </div>
 
     <div id="output-ui" class="mt-4">
-        <h3 class="font-bold">Moves</h3>
-        <ul class="mb-4">
-            <template x-for="(move, index) in game.moves" :key="`move-${index}`">
-                <li>
-                    Across: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).acrossFlag"></span>
-                    | X: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).x"></span>
-                    | Y: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).y"></span>
-                    | Word: <span x-text="(Move.decodeFromBigInt(move.encodeAsBigint())).word"></span>
-                </li>
-            </template>
-        </ul>
+        <h3 class="font-bold mb-2">Moves</h3>
+        <table class="mb-4 border border-collapse text-left">
+            <thead>
+                <tr>
+                    <th class="w-32 px-2 py-1">Player</th>
+                    <th class="w-32 px-2 py-1">Word</th>
+                    <th class="w-20 px-2 py-1">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="(move, index) in game.moves" :key="`move-${index}`">
+                    <tr>
+                        <td class="px-2 py-1">Player <span x-text="index % 2 === 0 ? '1' : '2'"></span></td>
+                        <td class="px-2 py-1"><span x-text="move.word"></span></td>
+                        <td class="px-2 py-1"><span x-text="move.score"></span></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
     </div>
 </div>
 

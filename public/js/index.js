@@ -292,7 +292,10 @@ document.addEventListener('alpine:init', () => {
         replayMovesToBoard() {
             this.emptyBoard();
             this.game.moves.forEach((move) => {
-                this.playMoveToBoard(move);
+                let score = this.playMoveToBoard(move);
+                // Update the score for the move
+                move.score = score;
+
                 // Remove the played tiles from the letter bag
                 // TODO: This will remove already played tiles from the bag. This is not ideal.
                 // Maybe tell playMoveToBoard to remove tiles from the bag when played?
@@ -317,15 +320,14 @@ document.addEventListener('alpine:init', () => {
             let y = move.y
             let word = move.word
             let across = move.acrossFlag
-
             for (let i = 0; i < word.length; i++) {
                 if (across) {
                     // Only score perpendicular words if we're playing the tile
-                    scorePerpendicularWords = this.boardSquareIsPlayedTile(x + i, y)
+                    scorePerpendicularWords = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
                     score += this.playLetterToBoard(x + i, y, word[i], across, scorePerpendicularWords);
                 } else {
                     // Only score perpendicular words if we're playing the tile
-                    scorePerpendicularWords = this.boardSquareIsPlayedTile(x, y + i)
+                    scorePerpendicularWords = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
                     score += this.playLetterToBoard(x, y + i, word[i], across, scorePerpendicularWords);
                 }
             }
@@ -696,6 +698,8 @@ document.addEventListener('alpine:init', () => {
 
             // This will "replay" the move to the board, but re-uses that functionality to score the move
             const score = this.playMoveToBoard(thisMove);
+            // Update the move's score
+            thisMove.score = score;
 
             // Add the score to the player's total
             const player = this.game.getCurrentPlayer();

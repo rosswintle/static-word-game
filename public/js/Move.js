@@ -6,7 +6,7 @@
  * - XY - 4 bits * 2 = 8 bits
  * - LENGTH - 4 bits (can also be up to 15)
  * - The word (use lower case for blanks? or blank code followed by letter?) - max 9 *  5 = 45
- * - Score (maybe)?
+ * - Score - will be derived by the move being played to the board
  *
  * +-------+--------+---+---+-------------+
  * | TILES | LENGTH | Y | X | ACROSS/DOWN |
@@ -33,6 +33,8 @@ class Move {
         this.x = x
         this.y = y
         this.word = word
+        // The score will be calculated when the move is played
+        this.score = 0;
     }
 
     /**
