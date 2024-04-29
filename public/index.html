@@ -58,6 +58,7 @@
                             'bg-pink-200' : boardSquareIsCenterSquare(colIndex, rowIndex),
                             'bg-blue-200' : boardSquareIsInEnterLine(colIndex, rowIndex),
                             'bg-blue-300': boardSquareIsPlayedTile(colIndex, rowIndex),
+                            'bg-green-200': boardSquareIsLastMoveTile(colIndex, rowIndex),
                             'bg-blue-500 text-white' : boardSquareIsCurrentEnterPoint(colIndex, rowIndex)
                         }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
                 </template>

@@ -500,6 +500,20 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        boardSquareIsLastMoveTile(x, y) {
+            if (this.game.moves.length === 0) {
+                return false;
+            }
+
+            const lastMove = this.game.moves.at(-1);
+
+            if (lastMove.acrossFlag) {
+                return y === lastMove.y && x >= lastMove.x && x < lastMove.x + lastMove.word.length;
+            } else {
+                return x === lastMove.x && y >= lastMove.y && y < lastMove.y + lastMove.word.length;
+            }
+        },
+
         /**
          * If a board tile is selected and we are in "enter" mode then add to the board
          *
