@@ -2,7 +2,7 @@
 
 _I can't call it Scrabble. It's not Scrabble. That's someone else's game._
 
-This is a Scabble-like word game for 2 players that you can play in your browser.
+This is a Scrabble-like word game for 2 players that you can play in your browser.
 
 ## Static though? What?
 
