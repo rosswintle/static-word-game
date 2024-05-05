@@ -39,7 +39,8 @@
             <h2 class="font-bold">Your tiles</h2>
             <div>
                 <button class="px-2 py-1 border" @click="clearMove">Clear</button>
-                <button class="px-2 py-1 border" @click="submitMove">Play</button>
+                <button class="px-2 py-1 border" :disabled="getWordPlayedAsMove.length >= 2"
+                    @click="submitMove">Play</button>
             </div>
         </div>
         <div class="mb-2 flex items-center justify-center">

@@ -710,6 +710,11 @@ document.addEventListener('alpine:init', () => {
             // if it was played against existing tiles
             const thisMove = this.getWordPlayedAsMove();
 
+            // Words must be 2 letters or more
+            if (thisMove.word.length < 2) {
+                return;
+            }
+
             // This will "replay" the move to the board, but re-uses that functionality to score the move
             const score = this.playMoveToBoard(thisMove);
             // Update the move's score
