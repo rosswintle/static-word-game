@@ -185,6 +185,36 @@ const letterValues = {
 }
 
 /**
+ * This generates a 32-bit hash of a string. It's used to seed the random number generator.
+ *
+ * A 32-bit number can be up to 4,294,967,296 so we can use this to seed the random number.
+ * (Originally the random number generator was seeded with a random number between 0 and 10,000,000,000)
+ *
+ * This is from: https://stackoverflow.com/a/22429679
+ *
+ * @param {string} str the input value
+ * @param {boolean} [asString=false] set to true to return the hash value as
+ *     8-digit hex string instead of an integer
+ * @param {integer} [seed] optionally pass the hash of the previous chunk
+ * @returns {integer | string}
+ */
+function hashFnv32a(str, asString, seed) {
+    /*jshint bitwise:false */
+    var i, l,
+        hval = (seed === undefined) ? 0x811c9dc5 : seed;
+
+    for (i = 0, l = str.length; i < l; i++) {
+        hval ^= str.charCodeAt(i);
+        hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+    }
+    if (asString) {
+        // Convert to 8 digit hex string
+        return ("0000000" + (hval >>> 0).toString(16)).substr(-8);
+    }
+    return hval >>> 0;
+}
+
+/**
  * This is a random number generator generator (!!) that is seeded with a number.
  *
  * From: https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
@@ -201,7 +231,14 @@ function mulberry32(seed) {
     }
 }
 
-const seed = Math.floor(Math.random() * 10_000_000_000)
+// Start with a random seed. If we have a game hash, use the hash of the game hash instead!
+let seed = Math.floor(Math.random() * 10_000_000_000)
+const gameHash = document.location.hash.substring(1)
+
+if (gameHash.length > 0) {
+    seed = hashFnv32a(gameHash)
+}
+
 const getRandom = mulberry32(seed)
 
 function shuffleArray(array) {
