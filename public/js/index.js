@@ -723,9 +723,10 @@ document.addEventListener('alpine:init', () => {
          * adjacent tiles that the word was played against. It will also adjust the
          * start square to the start of the word if it was played against existing tiles.
          *
-         * @returns {string} The word played with the current move
+         * @returns {Move} The word played with the current move
          */
         getWordPlayedAsMove() {
+            console.log('Getting word played')
             if (this.enterDirection === 'across') {
                 return this.getWordPlayedAcross();
             } else {
