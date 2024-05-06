@@ -87,6 +87,9 @@ class Player {
     topUpTiles(letterBag) {
         let tilesNeeded = 7 - this.tiles.length
         for (let i = 0; i < tilesNeeded; i++) {
+            if (letterBag.length === 0) {
+                break
+            }
             this.tiles.push(letterBag.pop())
         }
     }
