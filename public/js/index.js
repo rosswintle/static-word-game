@@ -329,28 +329,26 @@ document.addEventListener('alpine:init', () => {
         replayMovesToBoard() {
             this.emptyBoard();
             this.game.moves.forEach((move) => {
-                let score = this.playMoveToBoard(move);
+                let score = this.playMoveToBoard(move, removeTilesFromBag = true);
                 // Update the score for the move
                 move.score = score;
-
-                // Remove the played tiles from the letter bag
-                // TODO: This will remove already played tiles from the bag. This is not ideal.
-                // Maybe tell playMoveToBoard to remove tiles from the bag when played?
-                move.word.split('').forEach((letter) => {
-                    this.removeFromLetterBag(letter);
-                })
             })
         },
 
         /**
          * Plays a move to the board. This will update the board and return the score for the move.
          *
-         * Does NOT affect the tile bag or the player's rack.
+         * If we are replaying moves, we also want to remove the tiles from the tile bag when new tiles
+         * are played.
+         *
+         * We do this here rather than higher up because it's here that we check if the tile is played by
+         * this move, or if it's an existing/adjoining tile.
          *
          * @param {Move} move The move to play
+         * @param {boolean} [removeTilesFromBag=false] If true, the tiles will be removed from the letter bag
          * @returns {number} The score for the move
          */
-        playMoveToBoard(move) {
+        playMoveToBoard(move, removeTilesFromBag = false) {
             let score = 0;
 
             let x = move.x
@@ -360,12 +358,16 @@ document.addEventListener('alpine:init', () => {
             for (let i = 0; i < word.length; i++) {
                 if (across) {
                     // Only score perpendicular words if we're playing the tile
-                    scorePerpendicularWords = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
-                    score += this.playLetterToBoard(x + i, y, word[i], across, scorePerpendicularWords);
+                    tilePlayedThisMove = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
+                    score += this.playLetterToBoard(x + i, y, word[i], across, tilePlayedThisMove);
                 } else {
                     // Only score perpendicular words if we're playing the tile
-                    scorePerpendicularWords = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
-                    score += this.playLetterToBoard(x, y + i, word[i], across, scorePerpendicularWords);
+                    tilePlayedThisMove = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
+                    score += this.playLetterToBoard(x, y + i, word[i], across, tilePlayedThisMove);
+                }
+
+                if (tilePlayedThisMove && removeTilesFromBag) {
+                    this.removeFromLetterBag(word[i]);
                 }
             }
 
