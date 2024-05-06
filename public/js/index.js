@@ -503,10 +503,18 @@ document.addEventListener('alpine:init', () => {
             if (this.enterDirection === 'across') {
                 while (this.tileHasLetter(x + this.enterOffset, y)) {
                     this.enterOffset++;
+                    if (x + this.enterOffset >= 15) {
+                        this.isStartSquareSelected = false;
+                        return;
+                    }
                 }
             } else {
                 while (this.tileHasLetter(x, y + this.enterOffset)) {
                     this.enterOffset++;
+                    if (y + this.enterOffset >= 15) {
+                        this.isStartSquareSelected = false;
+                        return;
+                    }
                 }
             }
         },
