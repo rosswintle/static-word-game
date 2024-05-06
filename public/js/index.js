@@ -503,16 +503,14 @@ document.addEventListener('alpine:init', () => {
             if (this.enterDirection === 'across') {
                 while (this.tileHasLetter(x + this.enterOffset, y)) {
                     this.enterOffset++;
-                    if (x + this.enterOffset >= 15) {
-                        this.isStartSquareSelected = false;
+                    if (this.enterOffsetIsOffBoard()) {
                         return;
                     }
                 }
             } else {
                 while (this.tileHasLetter(x, y + this.enterOffset)) {
                     this.enterOffset++;
-                    if (y + this.enterOffset >= 15) {
-                        this.isStartSquareSelected = false;
+                    if (this.enterOffsetIsOffBoard()) {
                         return;
                     }
                 }
@@ -630,6 +628,14 @@ document.addEventListener('alpine:init', () => {
         },
 
         /**
+         * Returns true if tiles have been played and they constitute a valid move. This says we are
+         * ready for the move to be submitted.
+         */
+        playedTilesAreValidMove() {
+            return (this.playedTiles.length > 0) && (this.getWordPlayedAsMove().word.length >= 2)
+        },
+
+        /**
          * Returns true if the specified square on the board has a tile from the current move
          * played on it.
          *
@@ -736,7 +742,6 @@ document.addEventListener('alpine:init', () => {
          * @returns {Move} The word played with the current move
          */
         getWordPlayedAsMove() {
-            console.log('Getting word played')
             if (this.enterDirection === 'across') {
                 return this.getWordPlayedAcross();
             } else {
@@ -745,7 +750,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         submitMove() {
-            if (this.moveIsPlayed) {
+            if (this.moveIsPlayed || !this.playedTilesAreValidMove()) {
                 return;
             }
 
