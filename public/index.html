@@ -40,6 +40,50 @@
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
 
+    <!-- Modal -->
+<div x-show="swapModalOpen" style="display: none" x-on:keydown.escape.prevent.stop="closeSwapModal" role="dialog"
+    aria-modal="true" x-id="['swapModal']" :aria-labelledby="$id('swapModal')"
+    class="fixed inset-0 z-10 overflow-y-auto">
+    <!-- Overlay -->
+    <div x-show="swapModalOpen" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
+
+    <!-- Panel -->
+    <div x-show="swapModalOpen" x-transition x-on:click="closeSwapModal"
+        class="relative flex min-h-screen items-center justify-center p-4">
+        <div x-on:click.stop x-trap.noscroll.inert="swapModalOpen"
+            class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg">
+            <!-- Title -->
+            <h2 class="mb-4 text-3xl text-center" :id="$id('swapModal')">Select letters to swap</h2>
+
+            <!-- Content -->
+            <div id="swap-tiles-modal-content" class="mb-2 flex items-center justify-center">
+                <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
+                    <button :class="{
+                'relative w-11 h-11 leading-11 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
+                'bg-blue-200': tileIsSelectedForSwap(index)
+            }" @click="togglePlayerTileForSwap(index)">
+                        <span class="" x-text="tile"></span>
+                        <span class="absolute bottom-0.5 right-1 text-xs font-normal"
+                            x-text="letterValues[tile]"></span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- Buttons -->
+            <div class="mt-8 flex space-x-2 justify-center">
+                <button type="button" x-on:click="closeSwapModal" class="mr-6">
+                    Cancel
+                </button>
+
+                <button type="button" x-on:click="swapTilesAndSkip"
+                    class="rounded-md border border-gray-200 bg-white px-5 py-2.5">
+                    Swap and skip turn
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone.<br>
         Endcoded game data is passed between players in the URL. Enjoy!</p>
 
@@ -70,7 +114,10 @@
         <div id="enter-move-ui-title" class="flex justify-between items-center mb-2">
             <h2 class="font-bold">Your tiles</h2>
             <div>
-                <button class="px-2 py-1 border border-black" @click="clearMove">Clear</button>
+                <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
+                    @click="openSwapModal" :disabled="moveIsPlayed">Skip/Swap</button>
+                <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
+                    @click="clearMove" :disabled="moveIsPlayed">Clear</button>
                 <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
                     :disabled="! playedTilesAreValidMove()" @click="submitMove">Play</button>
             </div>
@@ -131,7 +178,8 @@
 <script src="/js/Move.js"></script>
 <script src="/js/Game.js"></script>
 <script src="/js/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@2.x.x/dist/alpine-clipboard.js"
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-clipboard@2.x.x/dist/alpine-clipboard.js"
     defer></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 

@@ -45,6 +45,12 @@ class Move {
     encodeAsBigint() {
         let moveAsBigInt = new CodedInt(0n);
 
+        // An empty move should be encoded as 13 1's!
+        if (this.word === '') {
+            moveAsBigInt.pushBits(13, 0b1111111111111);
+            return moveAsBigInt;
+        }
+
         // The word!
         this.word.toUpperCase().split('').map((char) => {
             // We use 1-based indexing so that we don't end up with a zero value at the end
@@ -77,12 +83,20 @@ class Move {
         let coded = new CodedInt(codedSrc);
         // let remainingBits = moveAsInt;
 
-        acrossFlag = coded.popBits(1);
+        // Get the first 13 bits. If these are 13 1s then this is an empty move
+        let moveMeta = coded.popBits(13);
+        if (moveMeta === 0b1111111111111) {
+            return new Move(false, 0, 0, '');
+        }
 
-        y = Number(coded.popBits(4));
-        x = Number(coded.popBits(4));
+        let codedMeta = new CodedInt(moveMeta);
 
-        length = coded.popBits(4);
+        acrossFlag = codedMeta.popBits(1);
+
+        y = Number(codedMeta.popBits(4));
+        x = Number(codedMeta.popBits(4));
+
+        length = codedMeta.popBits(4);
 
         let wordString = '';
 

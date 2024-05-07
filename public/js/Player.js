@@ -93,4 +93,34 @@ class Player {
             this.tiles.push(letterBag.pop())
         }
     }
+
+    /**
+     * Removes the tiles from the player's rack and puts them back in the letter bag.
+     *
+     * @param {Number[]} tileIndexes The tile indexes to remove
+     * @param {String[]} letterBag The letter bag to return to
+     */
+    returnTiles(tileIndexes, letterBag) {
+        let newTiles = []
+        for (let i = 0; i < this.tiles.length; i++) {
+            if (tileIndexes.includes(i)) {
+                letterBag.push(this.tiles[i])
+            } else {
+                newTiles.push(this.tiles[i])
+            }
+        }
+        this.tiles = newTiles
+    }
+
+    /**
+     * Swaps the specified tiles (indexes) with different tiles from the letter bag.
+     *
+     * @param {Number[]} tileIndexes The indexes of the tiles to swap
+     * @param {String[]} letterBag The letter bag to swap from
+     */
+    swapTiles(tileIndexes, letterBag) {
+        this.returnTiles(tileIndexes, letterBag)
+        shuffleArray(letterBag)
+        this.topUpTiles(letterBag)
+    }
 }

@@ -8,6 +8,8 @@
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
 
+    <?php includePart('../parts/swap-modal.html') ?>
+
     <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone.<br>
         Endcoded game data is passed between players in the URL. Enjoy!</p>
 
@@ -38,7 +40,10 @@
         <div id="enter-move-ui-title" class="flex justify-between items-center mb-2">
             <h2 class="font-bold">Your tiles</h2>
             <div>
-                <button class="px-2 py-1 border border-black" @click="clearMove">Clear</button>
+                <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
+                    @click="openSwapModal" :disabled="moveIsPlayed">Skip/Swap</button>
+                <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
+                    @click="clearMove" :disabled="moveIsPlayed">Clear</button>
                 <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
                     :disabled="! playedTilesAreValidMove()" @click="submitMove">Play</button>
             </div>
