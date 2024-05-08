@@ -37,7 +37,7 @@ class Game {
      * @returns {CodedInt} The game encoded as a BigInt (wrapped in a CodedInt)
      */
     encodeAsBigint() {
-        debugger;
+        // debugger;
         let gameAsBigInt = new CodedInt(0n);
 
         // The moves - Reverse them first, so that the most recent move is the last one pushed

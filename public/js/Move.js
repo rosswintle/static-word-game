@@ -47,7 +47,7 @@ class Move {
 
         // An empty move should be encoded as 13 1's!
         if (this.word === '') {
-            moveAsBigInt.pushBits(13, 0b1111111111111);
+            moveAsBigInt.pushBits(13, 0b1111111111111n);
             return moveAsBigInt;
         }
 
@@ -85,7 +85,7 @@ class Move {
 
         // Get the first 13 bits. If these are 13 1s then this is an empty move
         let moveMeta = coded.popBits(13);
-        if (moveMeta === 0b1111111111111) {
+        if (moveMeta === 0b1111111111111n) {
             return new Move(false, 0, 0, '');
         }
 
