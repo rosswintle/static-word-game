@@ -54,6 +54,24 @@ const letterValues = {
     Z: 10
 }
 
+const bonusSquares = [
+    ['TW', '', '', 'DL', '', '', '', 'TW', '', '', '', 'DL', '', '', 'TW',],
+    ['', 'DW', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'DW', '',],
+    ['', '', 'DW', '', '', '', 'DL', '', 'DL', '', '', '', 'DW', '', '',],
+    ['DL', '', '', 'DW', '', '', '', 'DL', '', '', '', 'DW', '', '', 'DL',],
+    ['', '', '', '', 'DW', '', '', '', '', '', 'DW', '', '', '', '',],
+    ['', 'TL', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'TL', '',],
+    ['', '', 'DL', '', '', '', 'DL', '', 'DL', '', '', '', 'DL', '', '',],
+    ['TW', '', '', 'DL', '', '', '', 'X', '', '', '', 'DL', '', '', 'TW',],
+    ['', '', 'DL', '', '', '', 'DL', '', 'DL', '', '', '', 'DL', '', '',],
+    ['', 'TL', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'TL', '',],
+    ['', '', '', '', 'DW', '', '', '', '', '', 'DW', '', '', '', '',],
+    ['DL', '', '', 'DW', '', '', '', 'DL', '', '', '', 'DW', '', '', 'DL',],
+    ['', '', 'DW', '', '', '', 'DL', '', 'DL', '', '', '', 'DW', '', '',],
+    ['', 'DW', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'DW', '',],
+    ['TW', '', '', 'DL', '', '', '', 'TW', '', '', '', 'DL', '', '', 'TW',],
+]
+
 /**
  * This generates a 32-bit hash of a string. It's used to seed the random number generator.
  *
@@ -235,6 +253,7 @@ document.addEventListener('alpine:init', () => {
                 if (across) {
                     // Only score perpendicular words if we're playing the tile
                     tilePlayedThisMove = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
+                    // TODO: Bonus scoring. Eeek!
                     score += this.playLetterToBoard(x + i, y, word[i], across, tilePlayedThisMove);
                 } else {
                     // Only score perpendicular words if we're playing the tile
@@ -395,6 +414,22 @@ document.addEventListener('alpine:init', () => {
 
         boardSquareIsCenterSquare(x, y) {
             return x === 7 && y === 7;
+        },
+
+        boardSquareIsTripleWord(x, y) {
+            return (bonusSquares[y][x] === 'TW');
+        },
+
+        boardSquareIsDoubleWord(x, y) {
+            return (bonusSquares[y][x] === 'DW');
+        },
+
+        boardSquareIsTripleLetter(x, y) {
+            return (bonusSquares[y][x] === 'TL');
+        },
+
+        boardSquareIsDoubleLetter(x, y) {
+            return (bonusSquares[y][x] === 'DL');
         },
 
         boardSquareIsCurrentEnterPoint(x, y) {

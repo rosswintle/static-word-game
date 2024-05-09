@@ -25,9 +25,13 @@
                 <template x-for="(tile, colIndex) in row" :key="`tile-${colIndex}`">
                     <button :class="{
                             'border border-gray-300 w-6 h-6 leading-6 text-center' : true,
+                            'bg-red-500': boardSquareIsTripleWord(colIndex, rowIndex),
+                            'bg-red-300': boardSquareIsDoubleWord(colIndex, rowIndex),
+                            'bg-blue-500': boardSquareIsTripleLetter(colIndex, rowIndex),
+                            'bg-blue-300': boardSquareIsDoubleLetter(colIndex, rowIndex),
                             'bg-pink-200' : boardSquareIsCenterSquare(colIndex, rowIndex),
-                            'bg-blue-200' : boardSquareIsInEnterLine(colIndex, rowIndex),
-                            'bg-blue-300': boardSquareIsPlayedTile(colIndex, rowIndex),
+                            'bg-teal-500' : boardSquareIsInEnterLine(colIndex, rowIndex),
+                            'bg-teal-300': boardSquareIsPlayedTile(colIndex, rowIndex),
                             'bg-green-200': boardSquareIsLastMoveTile(colIndex, rowIndex),
                             'bg-blue-500 text-white' : boardSquareIsCurrentEnterPoint(colIndex, rowIndex)
                         }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
