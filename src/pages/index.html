@@ -48,9 +48,9 @@
                     :disabled="! playedTilesAreValidMove()" @click="submitMove">Play</button>
             </div>
         </div>
-        <div class="mb-2 flex items-center justify-center">
+        <div x-sort class="mb-2 flex items-center justify-center">
             <template x-for="(tile, index) in thisMovePlayer.tiles" :key="`tile-${index}`">
-                <button :class="{
+                <button x-sort:item :class="{
                             'relative w-11 h-11 leading-11 text-center border border-grey-300 rounded mx-1 text-xl font-bold': true,
                             'bg-blue-200': tileIsPlayed(index)
                         }" @click="selectPlayerTile(index)">
@@ -75,24 +75,27 @@
 
     <div id="output-ui" class="mt-4">
         <h3 class="font-bold mb-2">Moves</h3>
-        <table class="mb-4 border border-collapse text-left">
-            <thead>
-                <tr>
-                    <th class="w-32 px-2 py-1">Player</th>
-                    <th class="w-32 px-2 py-1">Word</th>
-                    <th class="w-20 px-2 py-1">Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template x-for="(move, index) in game.moves.toReversed()" :key="`move-${index}`">
-                    <tr :class="{ 'bg-green-200' : index === 0 }">
-                        <td class="px-2 py-1">Player <span x-text="index % 2 === 0 ? '1' : '2'"></span></td>
-                        <td class="px-2 py-1"><span x-text="move.word"></span></td>
-                        <td class="px-2 py-1"><span x-text="move.score"></span></td>
+        <p x-show="game.moves.length === 0" class="mb-2">No moves yet</p>
+        <div x-show="game.moves.length > 0">
+            <table class="mb-4 border border-collapse text-left">
+                <thead>
+                    <tr>
+                        <th class="w-32 px-2 py-1">Player</th>
+                        <th class="w-32 px-2 py-1">Word</th>
+                        <th class="w-20 px-2 py-1">Score</th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <template x-for="(move, index) in game.moves.toReversed()" :key="`move-${index}`">
+                        <tr :class="{ 'bg-green-200' : index === 0 }">
+                            <td class="px-2 py-1">Player <span x-text="index % 2 === 0 ? '1' : '2'"></span></td>
+                            <td class="px-2 py-1"><span x-text="move.word"></span></td>
+                            <td class="px-2 py-1"><span x-text="move.score"></span></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
