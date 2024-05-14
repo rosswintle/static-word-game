@@ -7,8 +7,13 @@
 </p>
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
+    <p class="text-sm text-center mb-4">
+        <a class="underline" href="#" @click.prevent="openInstructionsModal">Instructions</a>
+        - <a class="underline" href="#" @click.prevent="newGame">New game</a>
+    </p>
 
     <?php includePart('../parts/swap-modal.html') ?>
+    <?php includePart('../parts/instructions-modal.html') ?>
 
     <h2 class="text-center mb-2" x-text="'Welcome, Player ' + thisMovePlayerId"></h2>
 

@@ -157,6 +157,7 @@ document.addEventListener('alpine:init', () => {
         moveIsPlayed: false,
         copyButtonText: 'Copy link to clipboard',
         swapModalOpen: false,
+        instructionsModalOpen: false,
         swapTiles: [],
 
         init() {
@@ -182,6 +183,12 @@ document.addEventListener('alpine:init', () => {
             shuffleArray(this.letterBag);
             this.game.player1.topUpTiles(this.letterBag);
             this.game.player2.topUpTiles(this.letterBag);
+        },
+
+        newGame() {
+            console.log('New game')
+            window.location.hash = '';
+            window.location.reload();
         },
 
         otherPlayerScore() {
@@ -819,6 +826,14 @@ document.addEventListener('alpine:init', () => {
         closeSwapModal() {
             this.swapModalOpen = false;
             this.swapTiles = [];
+        },
+
+        openInstructionsModal() {
+            this.instructionsModalOpen = true;
+        },
+
+        closeInstructionsModal() {
+            this.instructionsModalOpen = false;
         },
 
         tileIsSelectedForSwap(tileIndex) {

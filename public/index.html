@@ -39,6 +39,10 @@
 </p>
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
+    <p class="text-sm text-center mb-4">
+        <a class="underline" href="#" @click.prevent="openInstructionsModal">Instructions</a>
+        - <a class="underline" href="#" @click.prevent="newGame">New game</a>
+    </p>
 
     <!-- Modal -->
 <div x-show="swapModalOpen" style="display: none" x-on:keydown.escape.prevent.stop="closeSwapModal" role="dialog"
@@ -78,6 +82,68 @@
                 <button type="button" x-on:click="swapTilesAndSkip"
                     class="rounded-md border border-gray-200 bg-white px-5 py-2.5">
                     Swap and skip turn
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Modal -->
+<div x-show="instructionsModalOpen" style="display: none" x-on:keydown.escape.prevent.stop="closeInstructionsModal"
+    role="dialog" aria-modal="true" x-id="['instructionsModal']" :aria-labelledby="$id('instructionsModal')"
+    class="fixed inset-0 z-10 overflow-y-auto">
+    <!-- Overlay -->
+    <div x-show="instructionsModalOpen" x-transition.opacity class="fixed inset-0 bg-black bg-opacity-50"></div>
+
+    <!-- Panel -->
+    <div x-show="instructionsModalOpen" x-transition x-on:click="closeInstructionsModal"
+        class="relative flex min-h-screen items-center justify-center p-4">
+        <div x-on:click.stop x-trap.noscroll.inert="instructionsModalOpen"
+            class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg">
+            <!-- Title -->
+            <h2 class="mb-4 text-3xl text-center" :id="$id('swapModal')">Instructions</h2>
+
+            <!-- Content -->
+            <div id="instructions-tiles-modal-content" class="mb-2 prose">
+                <p>This is a 2-player word game. You will probably recognise it. I'm not allowed to call it that though.
+                </p>
+                <p>The game is totally free, and requires no login.</p>
+                <p>It works by giving you a website link once you have played your move. You send this link to your
+                    opponent.
+                    They then take their turn, and send you a link back!
+                </p>
+                <h3>Beginning a game</h3>
+                <p>To start a game, just open this page and, if you don't see a new game, click "New game".</p>
+                <h3>Playing a move</h3>
+                <p>To play a move:</p>
+                <ul>
+                    <li>Click or tap on the board where you want to start placing tiles.</li>
+                    <li>Clicking or tapping the start point again switches between horizontal and vertical placement.
+                    </li>
+                    <li>Click or tap on your tiles to place them on the board.</li>
+                    <li>You can drag and drop tiles on your "rack", but not onto the board.</li>
+                    <li>Click "Clear" to clear your move and return tiles to your rack.</li>
+                    <li>Click "Skip/Swap" to skip your turn and swap tiles.</li>
+                    <li>Click "Play" to submit your move.</li>
+                </ul>
+                <h3>Passing play to your opponent</h3>
+                <p>Once you have played your move, you will be given a link to send to your opponent. Use the "Copy link
+                    to clipboard" button to copy the link. You can then paste it into a message or email.</p>
+                <p>Your opponent will then take their turn, and send you a link back.</p>
+                <p>This works best using an instant messenger like iMessage or WhatsApp.</p>
+                <h3>Limitations</h3>
+                <ul>
+                    <li>There is currently no checking of words against a dictionary. If you dispute a move
+                        then let your opponent know and ask them to play a different move using the last
+                        link you sent them.</li>
+                    <li>The game is currently limited to two players.</li>
+                </ul>
+            </div>
+
+            <!-- Buttons -->
+            <div class="mt-8 flex space-x-2 justify-center">
+                <button type="button" x-on:click="closeInstructionsModal"
+                    class="px-6 py-3 border border-gray-400 rounded">
+                    Let's Play!
                 </button>
             </div>
         </div>
