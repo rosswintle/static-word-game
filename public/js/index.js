@@ -54,6 +54,24 @@ const letterValues = {
     Z: 10
 }
 
+const bonusSquares = [
+    ['TW', '', '', 'DL', '', '', '', 'TW', '', '', '', 'DL', '', '', 'TW',],
+    ['', 'DW', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'DW', '',],
+    ['', '', 'DW', '', '', '', 'DL', '', 'DL', '', '', '', 'DW', '', '',],
+    ['DL', '', '', 'DW', '', '', '', 'DL', '', '', '', 'DW', '', '', 'DL',],
+    ['', '', '', '', 'DW', '', '', '', '', '', 'DW', '', '', '', '',],
+    ['', 'TL', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'TL', '',],
+    ['', '', 'DL', '', '', '', 'DL', '', 'DL', '', '', '', 'DL', '', '',],
+    ['TW', '', '', 'DL', '', '', '', 'DW', '', '', '', 'DL', '', '', 'TW',],
+    ['', '', 'DL', '', '', '', 'DL', '', 'DL', '', '', '', 'DL', '', '',],
+    ['', 'TL', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'TL', '',],
+    ['', '', '', '', 'DW', '', '', '', '', '', 'DW', '', '', '', '',],
+    ['DL', '', '', 'DW', '', '', '', 'DL', '', '', '', 'DW', '', '', 'DL',],
+    ['', '', 'DW', '', '', '', 'DL', '', 'DL', '', '', '', 'DW', '', '',],
+    ['', 'DW', '', '', '', 'TL', '', '', '', 'TL', '', '', '', 'DW', '',],
+    ['TW', '', '', 'DL', '', '', '', 'TW', '', '', '', 'DL', '', '', 'TW',],
+]
+
 /**
  * This generates a 32-bit hash of a string. It's used to seed the random number generator.
  *
@@ -139,6 +157,7 @@ document.addEventListener('alpine:init', () => {
         moveIsPlayed: false,
         copyButtonText: 'Copy link to clipboard',
         swapModalOpen: false,
+        instructionsModalOpen: false,
         swapTiles: [],
 
         init() {
@@ -164,6 +183,12 @@ document.addEventListener('alpine:init', () => {
             shuffleArray(this.letterBag);
             this.game.player1.topUpTiles(this.letterBag);
             this.game.player2.topUpTiles(this.letterBag);
+        },
+
+        newGame() {
+            console.log('New game')
+            window.location.hash = '';
+            window.location.reload();
         },
 
         otherPlayerScore() {
@@ -225,54 +250,148 @@ document.addEventListener('alpine:init', () => {
          * @returns {number} The score for the move
          */
         playMoveToBoard(move, removeTilesFromBag = false) {
+            // This will be the total score for the move including any perpendicular words and bonuses
             let score = 0;
+            // This will be just the score for the tiles played - no word bonuses (these are calculated at the end),
+            // only letter bonuses.
+            let thisWordScore = 0;
+
+            let wordBonusMultiplier = 1;
 
             let x = move.x
             let y = move.y
             let word = move.word
             let across = move.acrossFlag
             for (let i = 0; i < word.length; i++) {
+                console.log('Playing ' + word[i] + ' worth ' + letterValues[word[i]] + ' at ' + (x + i) + ', ' + y)
+                let thisTilePoints = letterValues[word[i]];
+                let otherWordScore = 0;
+                letterBonusMultiplier = 1;
+
                 if (across) {
                     // Only score perpendicular words if we're playing the tile
                     tilePlayedThisMove = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
-                    score += this.playLetterToBoard(x + i, y, word[i], across, tilePlayedThisMove);
+
+                    if (tilePlayedThisMove) {
+                        this.board[y][x + i] = word[i];
+                        otherWordScore = this.maybeScoreVerticalWord(x + i, y);
+                    }
+
+                    if (bonusSquares[y][x + i] === 'TW' && tilePlayedThisMove) {
+                        console.log('TW detected for word ' + word + ' at ' + (x + i) + ', ' + y)
+                        wordBonusMultiplier *= 3;
+                        // Add triple the score of the perpendicular word
+                        if (otherWordScore > 0) {
+                            score += otherWordScore * 3;
+                        }
+                        // Add the tile points to the word score
+                        thisWordScore += thisTilePoints;
+                    }
+                    if (bonusSquares[y][x + i] === 'DW' && tilePlayedThisMove) {
+                        console.log('DW detected for word ' + word + ' at ' + (x + i) + ', ' + y)
+                        wordBonusMultiplier *= 2;
+                        // Add double the score of the perpendicular word
+                        if (otherWordScore > 0) {
+                            score += otherWordScore * 2;
+                        }
+                        // Add the tile points to the word score
+                        thisWordScore += thisTilePoints;
+                    }
+                    if (bonusSquares[y][x + i] === 'TL' && tilePlayedThisMove) {
+                        console.log('TL detected for word ' + word + ' at ' + (x + i) + ', ' + y)
+                        // Add the score of the perpendicular word plus bonus points for the
+                        // perpendicular word. This is only adding * 2 because the tile in the
+                        // perpendicular word has already been added to the score once.
+                        if (otherWordScore > 0) {
+                            score += otherWordScore + (thisTilePoints * 2);
+                        }
+                        thisWordScore += thisTilePoints * 3;
+                    }
+                    if (bonusSquares[y][x + i] === 'DL' && tilePlayedThisMove) {
+                        console.log('DL detected for word ' + word + ' at ' + (x + i) + ', ' + y)
+                        // Add the score of the perpendicular word plus bonus points for the
+                        // perpendicular word. This is only adding * 1 because the tile in the
+                        // perpendicular word has already been added to the score once.
+                        if (otherWordScore > 0) {
+                            score += otherWordScore + thisTilePoints;
+                        }
+                        thisWordScore += thisTilePoints * 2;
+                    }
+
+                    // NO BONUSES!
+                    if (bonusSquares[y][x + i] === '') {
+                        thisWordScore += thisTilePoints;
+
+                        if (tilePlayedThisMove) {
+                            score += otherWordScore;
+                        }
+                    }
                 } else {
                     // Only score perpendicular words if we're playing the tile
                     tilePlayedThisMove = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
-                    score += this.playLetterToBoard(x, y + i, word[i], across, tilePlayedThisMove);
+
+                    if (tilePlayedThisMove) {
+                        this.board[y + i][x] = word[i];
+                        otherWordScore = this.maybeScoreHorizontalWord(x, y + i);
+                    }
+
+                    if (bonusSquares[y + i][x] === 'TW' && tilePlayedThisMove) {
+                        wordBonusMultiplier *= 3;
+                        // Add triple the score of the perpendicular word
+                        if (otherWordScore > 0) {
+                            score += otherWordScore * 3;
+                        }
+                        // Add the tile points to the word score
+                        thisWordScore += thisTilePoints;
+                    }
+                    if (bonusSquares[y + i][x] === 'DW' && tilePlayedThisMove) {
+                        wordBonusMultiplier *= 2;
+                        // Add double the score of the perpendicular word
+                        if (otherWordScore > 0) {
+                            score += otherWordScore * 2;
+                        }
+                        // Add the tile points to the word score
+                        thisWordScore += thisTilePoints;
+                    }
+                    if (bonusSquares[y + i][x] === 'TL' && tilePlayedThisMove) {
+                        // Add the score of the perpendicular word plus bonus points for the
+                        // perpendicular word. This is only adding * 2 because the tile in the
+                        // perpendicular word has already been added to the score once.
+                        if (otherWordScore > 0) {
+                            score += otherWordScore + (thisTilePoints * 2);
+                        }
+                        thisWordScore += thisTilePoints * 3;
+                    }
+                    if (bonusSquares[y + i][x] === 'DL' && tilePlayedThisMove) {
+                        // Add the score of the perpendicular word plus bonus points for the
+                        // perpendicular word. This is only adding * 1 because the tile in the
+                        // perpendicular word has already been added to the score once.
+                        if (otherWordScore > 0) {
+                            score += otherWordScore + thisTilePoints;
+                        }
+                        thisWordScore += thisTilePoints * 2;
+                    }
+
+                    // NO BONUSES!
+                    if (bonusSquares[y + i][x] === '') {
+                        thisWordScore += thisTilePoints;
+
+                        if (tilePlayedThisMove) {
+                            score += otherWordScore;
+                        }
+                    }
+
                 }
+
 
                 if (tilePlayedThisMove && removeTilesFromBag) {
                     this.removeFromLetterBag(word[i]);
                 }
+
             }
 
-            return score;
-        },
-
-        /**
-         * Plays the letter to the board at the specified coordinates. Returns the score for playing the
-         * letter, including any perpendicular words formed.
-         *
-         * @param {number} x The x coordinate
-         * @param {number} y The y coordinate
-         * @param {string} letter The letter to play
-         * @param {boolean} across True if the word is across
-         * @param {boolean} scorePerpendicularWords True if perpendicular words should be scored
-         * @return {number} Score for playing the letter, including any perpendicular words
-         */
-        playLetterToBoard(x, y, letter, across, scorePerpendicularWords) {
-            let score = letterValues[letter];
-
-            this.board[y][x] = letter;
-
-            if (scorePerpendicularWords) {
-                if (across) {
-                    score += this.maybeScoreVerticalWord(x, y);
-                } else {
-                    score += this.maybeScoreHorizontalWord(x, y);
-                }
-            }
+            console.log('Word score: ' + thisWordScore + ', word bonus: ' + wordBonusMultiplier + ', total: ' + thisWordScore * wordBonusMultiplier)
+            score += (thisWordScore * wordBonusMultiplier);
 
             return score;
         },
@@ -395,6 +514,22 @@ document.addEventListener('alpine:init', () => {
 
         boardSquareIsCenterSquare(x, y) {
             return x === 7 && y === 7;
+        },
+
+        boardSquareIsTripleWord(x, y) {
+            return (bonusSquares[y][x] === 'TW');
+        },
+
+        boardSquareIsDoubleWord(x, y) {
+            return (bonusSquares[y][x] === 'DW');
+        },
+
+        boardSquareIsTripleLetter(x, y) {
+            return (bonusSquares[y][x] === 'TL');
+        },
+
+        boardSquareIsDoubleLetter(x, y) {
+            return (bonusSquares[y][x] === 'DL');
         },
 
         boardSquareIsCurrentEnterPoint(x, y) {
@@ -691,6 +826,14 @@ document.addEventListener('alpine:init', () => {
         closeSwapModal() {
             this.swapModalOpen = false;
             this.swapTiles = [];
+        },
+
+        openInstructionsModal() {
+            this.instructionsModalOpen = true;
+        },
+
+        closeInstructionsModal() {
+            this.instructionsModalOpen = false;
         },
 
         tileIsSelectedForSwap(tileIndex) {

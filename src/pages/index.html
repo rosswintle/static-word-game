@@ -1,17 +1,19 @@
 <?php extend('../templates/main.html', ['title' => 'Untitled Word Game']) ?>
 
 <h1 class="mt-4 mb-1 text-3xl text-center">Untitled Word Game</h1>
-<p class="text-xs text-center mb-4">v0.53
+<p class="text-xs text-center mb-4">v0.61
     - <a class="underline" href="https://github.com/rosswintle/static-word-game/">GitHub</a>
     - <a class="underline" href="https://ko-fi.com/magicroundabout">Buy me a coffee</a>
 </p>
 
 <div x-data="scrabble" class="w-full max-w-4xl mx-auto flex flex-col items-center px-4">
+    <p class="text-sm text-center mb-4">
+        <a class="underline" href="#" @click.prevent="openInstructionsModal">Instructions</a>
+        - <a class="underline" href="#" @click.prevent="newGame">New game</a>
+    </p>
 
     <?php includePart('../parts/swap-modal.html') ?>
-
-    <p class="mb-4 text-center ">This is a prototype server-less Scrabble clone.<br>
-        Endcoded game data is passed between players in the URL. Enjoy!</p>
+    <?php includePart('../parts/instructions-modal.html') ?>
 
     <h2 class="text-center mb-2" x-text="'Welcome, Player ' + thisMovePlayerId"></h2>
 
@@ -25,9 +27,13 @@
                 <template x-for="(tile, colIndex) in row" :key="`tile-${colIndex}`">
                     <button :class="{
                             'border border-gray-300 w-6 h-6 leading-6 text-center' : true,
+                            'bg-red-500': boardSquareIsTripleWord(colIndex, rowIndex),
+                            'bg-red-300': boardSquareIsDoubleWord(colIndex, rowIndex),
+                            'bg-blue-500': boardSquareIsTripleLetter(colIndex, rowIndex),
+                            'bg-blue-300': boardSquareIsDoubleLetter(colIndex, rowIndex),
                             'bg-pink-200' : boardSquareIsCenterSquare(colIndex, rowIndex),
-                            'bg-blue-200' : boardSquareIsInEnterLine(colIndex, rowIndex),
-                            'bg-blue-300': boardSquareIsPlayedTile(colIndex, rowIndex),
+                            'bg-teal-500' : boardSquareIsInEnterLine(colIndex, rowIndex),
+                            'bg-teal-300': boardSquareIsPlayedTile(colIndex, rowIndex),
                             'bg-green-200': boardSquareIsLastMoveTile(colIndex, rowIndex),
                             'bg-blue-500 text-white' : boardSquareIsCurrentEnterPoint(colIndex, rowIndex)
                         }" @click="tileClick(colIndex, rowIndex)" x-text="tile"></button>
