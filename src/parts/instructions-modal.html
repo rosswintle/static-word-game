@@ -8,8 +8,8 @@
     <!-- Panel -->
     <div x-show="instructionsModalOpen" x-transition x-on:click="closeInstructionsModal"
         class="relative flex min-h-screen items-center justify-center p-4">
-        <div x-on:click.stop x-trap.noscroll.inert="instructionsModalOpen"
-            class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-12 shadow-lg">
+        <div x-on:click.stop x-trap.noscroll.inert.noautofocus="instructionsModalOpen"
+            class="relative w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-8 shadow-lg">
             <!-- Title -->
             <h2 class="mb-4 text-3xl text-center" :id="$id('swapModal')">Instructions</h2>
 
