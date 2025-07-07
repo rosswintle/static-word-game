@@ -45,6 +45,8 @@
     <div id="enter-move-ui" class="w-full max-w-md mt-4">
         <div id="enter-move-ui-title" class="flex justify-between items-center mb-2">
             <h2 class="font-bold">Your tiles</h2>
+            <div x-show="playedTilesAreValidMove()" class="">Move: <span
+                    x-text="playMoveToBoard(getWordPlayedAsMove())"></span> </div>
             <div>
                 <button class="px-2 py-1 border border-black disabled:text-gray-400 disabled:border-gray-400"
                     @click="openSwapModal" :disabled="moveIsPlayed">Skip/Swap</button>
