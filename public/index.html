@@ -240,7 +240,9 @@
                 <tbody>
                     <template x-for="(move, index) in game.moves.toReversed()" :key="`move-${index}`">
                         <tr :class="{ 'bg-green-200' : index === 0 }">
-                            <td class="px-2 py-1">Player <span x-text="index % 2 === 0 ? '1' : '2'"></span></td>
+                            <td class="px-2 py-1">Player <span
+                                    x-text="moveIsPlayed ? ((index + (thisMovePlayerId === 1 ? 2 : 1)) % 2 + 1) : ((index + thisMovePlayerId) % 2 + 1)"></span>
+                            </td>
                             <td class="px-2 py-1"><span x-text="move.word"></span></td>
                             <td class="px-2 py-1"><span x-text="move.score"></span></td>
                         </tr>
