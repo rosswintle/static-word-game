@@ -639,11 +639,34 @@ document.addEventListener('alpine:init', () => {
         },
 
         /**
+         * Returns true if the passed tile is adjacent to an existing played
+         * tile.
+         */
+        doesTileHaveAdjacentPlayedTile(tile) {
+            return (this.tileHasLetter(tile.x - 1, tile.y) && !this.boardSquareIsPlayedTile(tile.x - 1, tile.y)) ||
+                (this.tileHasLetter(tile.x + 1, tile.y) && !this.boardSquareIsPlayedTile(tile.x + 1, tile.y)) ||
+                (this.tileHasLetter(tile.x, tile.y - 1) && !this.boardSquareIsPlayedTile(tile.x, tile.y - 1)) ||
+                (this.tileHasLetter(tile.x, tile.y + 1) && !this.boardSquareIsPlayedTile(tile.x, tile.y + 1));
+        },
+
+        /**
+         * Returns true if at least one of the played tiles is adjacent
+         * to an existing tile. This is used to determine a valid move.
+         */
+        arePlayedTilesAdjacentToExisting() {
+            const areTilesAdjacent = Boolean(this.playedTiles.find(this.doesTileHaveAdjacentPlayedTile.bind(this)));
+            console.log('Are played tiles adjacent? ' + (areTilesAdjacent ? 'Yes' : 'No'));
+            return areTilesAdjacent;
+        },
+
+        /**
          * Returns true if tiles have been played and they constitute a valid move. This says we are
          * ready for the move to be submitted.
          */
         playedTilesAreValidMove() {
-            return (this.playedTiles.length > 0) && (this.getWordPlayedAsMove().word.length >= 2)
+            return (this.playedTiles.length > 0) &&
+                (this.getWordPlayedAsMove().word.length >= 2) &&
+                this.arePlayedTilesAdjacentToExisting();
         },
 
         /**
@@ -695,8 +718,11 @@ document.addEventListener('alpine:init', () => {
             }
 
             let wordPlayed = '';
-            for (let i = start; i <= end; i++) {
-                wordPlayed += this.board[y][i];
+            // If the start is blank, then we don't have a played word
+            if (this.board[y][start] !== '') {
+                for (let i = start; i <= end; i++) {
+                    wordPlayed += this.board[y][i];
+                }
             }
 
             // Construct a move object
@@ -732,8 +758,11 @@ document.addEventListener('alpine:init', () => {
             }
 
             let wordPlayed = '';
-            for (let i = start; i <= end; i++) {
-                wordPlayed += this.board[i][x];
+            // If the start is blank, then we don't have a played word
+            if (this.board[start][x] !== '') {
+                for (let i = start; i <= end; i++) {
+                    wordPlayed += this.board[i][x];
+                }
             }
 
             // Construct a move object
