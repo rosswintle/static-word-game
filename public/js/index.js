@@ -266,18 +266,19 @@ document.addEventListener('alpine:init', () => {
                 console.log('Playing ' + word[i] + ' worth ' + letterValues[word[i]] + ' at ' + (x + (across ? i : 0)) + ', ' + (y + (across ? 0 : i)))
                 let thisTilePoints = letterValues[word[i]];
                 let otherWordScore = 0;
-                letterBonusMultiplier = 1;
+                let letterBonusMultiplier = 1;
+                let isTilePlayedThisMove = false;
 
                 if (across) {
                     // Only score perpendicular words if we're playing the tile
-                    tilePlayedThisMove = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
+                    isTilePlayedThisMove = this.board[y][x + i] === '' || this.boardSquareIsPlayedTile(x + i, y)
 
-                    if (tilePlayedThisMove) {
+                    if (isTilePlayedThisMove) {
                         this.board[y][x + i] = word[i];
                         otherWordScore = this.maybeScoreVerticalWord(x + i, y);
                     }
 
-                    if (bonusSquares[y][x + i] === 'TW' && tilePlayedThisMove) {
+                    if (bonusSquares[y][x + i] === 'TW' && isTilePlayedThisMove) {
                         console.log('TW detected for word ' + word + ' at ' + (x + i) + ', ' + y)
                         wordBonusMultiplier *= 3;
                         // Add triple the score of the perpendicular word
@@ -287,7 +288,7 @@ document.addEventListener('alpine:init', () => {
                         // Add the tile points to the word score
                         thisWordScore += thisTilePoints;
                     }
-                    if (bonusSquares[y][x + i] === 'DW' && tilePlayedThisMove) {
+                    if (bonusSquares[y][x + i] === 'DW' && isTilePlayedThisMove) {
                         console.log('DW detected for word ' + word + ' at ' + (x + i) + ', ' + y)
                         wordBonusMultiplier *= 2;
                         // Add double the score of the perpendicular word
@@ -297,7 +298,7 @@ document.addEventListener('alpine:init', () => {
                         // Add the tile points to the word score
                         thisWordScore += thisTilePoints;
                     }
-                    if (bonusSquares[y][x + i] === 'TL' && tilePlayedThisMove) {
+                    if (bonusSquares[y][x + i] === 'TL' && isTilePlayedThisMove) {
                         console.log('TL detected for word ' + word + ' at ' + (x + i) + ', ' + y)
                         // Add the score of the perpendicular word plus bonus points for the
                         // perpendicular word. This is only adding * 2 because the tile in the
@@ -307,7 +308,7 @@ document.addEventListener('alpine:init', () => {
                         }
                         thisWordScore += thisTilePoints * 3;
                     }
-                    if (bonusSquares[y][x + i] === 'DL' && tilePlayedThisMove) {
+                    if (bonusSquares[y][x + i] === 'DL' && isTilePlayedThisMove) {
                         console.log('DL detected for word ' + word + ' at ' + (x + i) + ', ' + y)
                         // Add the score of the perpendicular word plus bonus points for the
                         // perpendicular word. This is only adding * 1 because the tile in the
@@ -322,20 +323,20 @@ document.addEventListener('alpine:init', () => {
                     if (bonusSquares[y][x + i] === '') {
                         thisWordScore += thisTilePoints;
 
-                        if (tilePlayedThisMove) {
+                        if (isTilePlayedThisMove) {
                             score += otherWordScore;
                         }
                     }
                 } else {
                     // Only score perpendicular words if we're playing the tile
-                    tilePlayedThisMove = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
+                    isTilePlayedThisMove = this.board[y + i][x] === '' || this.boardSquareIsPlayedTile(x, y + i)
 
-                    if (tilePlayedThisMove) {
+                    if (isTilePlayedThisMove) {
                         this.board[y + i][x] = word[i];
                         otherWordScore = this.maybeScoreHorizontalWord(x, y + i);
                     }
 
-                    if (bonusSquares[y + i][x] === 'TW' && tilePlayedThisMove) {
+                    if (bonusSquares[y + i][x] === 'TW' && isTilePlayedThisMove) {
                         console.log('TW detected for word ' + word + ' at ' + x + ', ' + (i + y));
                         wordBonusMultiplier *= 3;
                         // Add triple the score of the perpendicular word
@@ -345,7 +346,7 @@ document.addEventListener('alpine:init', () => {
                         // Add the tile points to the word score
                         thisWordScore += thisTilePoints;
                     }
-                    if (bonusSquares[y + i][x] === 'DW' && tilePlayedThisMove) {
+                    if (bonusSquares[y + i][x] === 'DW' && isTilePlayedThisMove) {
                         console.log('DW detected for word ' + word + ' at ' + x + ', ' + (i + y));
                         wordBonusMultiplier *= 2;
                         // Add double the score of the perpendicular word
@@ -355,7 +356,7 @@ document.addEventListener('alpine:init', () => {
                         // Add the tile points to the word score
                         thisWordScore += thisTilePoints;
                     }
-                    if (bonusSquares[y + i][x] === 'TL' && tilePlayedThisMove) {
+                    if (bonusSquares[y + i][x] === 'TL' && isTilePlayedThisMove) {
                         console.log('TL detected for word ' + word + ' at ' + x + ', ' + (i + y));
                         // Add the score of the perpendicular word plus bonus points for the
                         // perpendicular word. This is only adding * 2 because the tile in the
@@ -365,7 +366,7 @@ document.addEventListener('alpine:init', () => {
                         }
                         thisWordScore += thisTilePoints * 3;
                     }
-                    if (bonusSquares[y + i][x] === 'DL' && tilePlayedThisMove) {
+                    if (bonusSquares[y + i][x] === 'DL' && isTilePlayedThisMove) {
                         console.log('DL detected for word ' + word + ' at ' + x + ', ' + (i + y));
                         // Add the score of the perpendicular word plus bonus points for the
                         // perpendicular word. This is only adding * 1 because the tile in the
@@ -380,7 +381,7 @@ document.addEventListener('alpine:init', () => {
                     if (bonusSquares[y + i][x] === '') {
                         thisWordScore += thisTilePoints;
 
-                        if (tilePlayedThisMove) {
+                        if (isTilePlayedThisMove) {
                             score += otherWordScore;
                         }
                     }
@@ -388,7 +389,7 @@ document.addEventListener('alpine:init', () => {
                 }
 
 
-                if (tilePlayedThisMove && removeTilesFromBag) {
+                if (isTilePlayedThisMove && removeTilesFromBag) {
                     this.removeFromLetterBag(word[i]);
                 }
 
