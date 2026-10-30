@@ -320,7 +320,8 @@ document.addEventListener('alpine:init', () => {
                     }
 
                     // NO BONUSES!
-                    if (bonusSquares[y][x + i] === '') {
+                    // If it's an existing played tile with a bonus that should be added
+                    if (bonusSquares[y][x + i] === '' || !isTilePlayedThisMove) {
                         thisWordScore += thisTilePoints;
 
                         if (isTilePlayedThisMove) {
@@ -378,7 +379,8 @@ document.addEventListener('alpine:init', () => {
                     }
 
                     // NO BONUSES!
-                    if (bonusSquares[y + i][x] === '') {
+                    // If it's an existing played tile with a bonus that should be added
+                    if (bonusSquares[y + i][x] === '' || !isTilePlayedThisMove) {
                         thisWordScore += thisTilePoints;
 
                         if (isTilePlayedThisMove) {
